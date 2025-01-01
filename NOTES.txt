@@ -33,3 +33,38 @@ We will learn the most advanced topics of Backend development. Write Powerful Sc
 1. if, elif, else
 2. nested if
 3. multiple conditions with and, or, not
+
+#? Python Loops
+1. for loop
+2. while loop
+3. break statement
+4. continue statement
+5. pass statement
+6. Combination of break and continue statements
+
+#? Python Data Structures
+1. Lists - mutable ordered collection of elements
+    * Attributes: len(), index()
+    * Operations: append(), remove(), sort()
+2. 2D Lists - lists containing other lists
+    * Attributes: len() (for rows), len(matrix1) (for columns)
+    * Operations: indexing, slicing, modifying elements
+3. Dictionaries - key-value pairs
+    * Attributes: keys(), values(), items()
+    * Operations: add key-value pair, remove key
+4. Tuples - immutable ordered collection of elements
+    * Attributes: count(), index()
+    * Operations: concatenation
+5. Sets - unordered collection of unique elements
+    * Operations: add(), remove(), check membership
+6. Strings - sequence of characters
+    * Operations: upper(), lower(), count(), startswith(), endswith(), replace()
+
+#? Python Functions
+1. Functions - basic function definition and call
+2. Lambda functions - concise anonymous functions
+3. Recursive functions - functions calling themselves
+4. Default arguments - providing default values for function parameters
+5. Keyword arguments - passing arguments by name
+6. args and kwargs - handling variable number of positional and keyword arguments
+7. Scope in Python - global variables, local variables, and modifying variables in enclosing scopes
