@@ -1,0 +1,35 @@
+#! Become 2% of THE Django Developer
+We will learn the most advanced topics of Backend development. Write Powerful Scalable code with proper test cases latest tech stack like Redis, Elastic Search, Kibana, Celery, Sockets etc.
+
+#? Python 
+
+1. Python is a high level programming language
+2. Used in various applications like web development, Data Science, Machine Learning, AI, IoT, Game Development, Business Applications, etc.
+3. Some companies that use python include Google, Amazon, Facebook, Netflix, Uber, etc.
+
+#? Python Installation
+
+1. For Windows: Download Python from https://www.python.org/downloads/ and keep all the default options along with Add to Path.
+2. For Linux: sudo apt install python3
+3. For MacOS: brew install python
+
+#? Python2 vs Python3
+1. Python2 is the legacy version of Python and Python3 is the latest version of Python.
+2. Performance: Python3 is faster than Python2.
+3. Backward compatibility: Python3 is backward compatible with Python2.
+4. Libraries: Python3 has more libraries than Python2.
+
+#? Python Operators
+1. Arithmetic Operators: +, -, *, /, %, //, **
+2. Assignment Operators: =, +=, -=, *=, /=, %=
+3. Comparison Operators: ==, !=, >, <, >=, <=
+4. Logical Operators: and, or, not
+5. Identity Operators: is, is not
+6. Membership Operators: in, not in
+7. Bitwise Operators: &, |, ^, ~, <<, >>
+8. Special Operators: lambda, yield
+
+#? Python Conditions
+1. if, elif, else
+2. nested if
+3. multiple conditions with and, or, not
