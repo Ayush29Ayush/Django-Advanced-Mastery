@@ -68,3 +68,12 @@ We will learn the most advanced topics of Backend development. Write Powerful Sc
 5. Keyword arguments - passing arguments by name
 6. args and kwargs - handling variable number of positional and keyword arguments
 7. Scope in Python - global variables, local variables, and modifying variables in enclosing scopes
+
+#? Object Oriented Programming in Python
+1. Classes and Objects - defining classes and creating instances
+2. Class Attributes, Methods and variables - using class-level attributes and methods
+3. Constructors - initializing objects with init method
+4. Constructor Overloading - simulating constructor overloading (Python doesn't support true overloading)
+5. Inheritance and Polymorphism - creating base and derived classes, demonstrating polymorphic behavior
+6. Abstraction and Encapsulation - hiding internal details and protecting data
+7. Static Methods and Class Methods - using @staticmethod and @classmethod decorators
