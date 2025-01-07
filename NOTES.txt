@@ -69,7 +69,7 @@ We will learn the most advanced topics of Backend development. Write Powerful Sc
 6. args and kwargs - handling variable number of positional and keyword arguments
 7. Scope in Python - global variables, local variables, and modifying variables in enclosing scopes
 
-#? Object Oriented Programming in Python
+#? Advanced Python - Object Oriented Programming
 1. Classes and Objects - defining classes and creating instances
 2. Class Attributes, Methods and variables - using class-level attributes and methods
 3. Constructors - initializing objects with init method
@@ -77,3 +77,35 @@ We will learn the most advanced topics of Backend development. Write Powerful Sc
 5. Inheritance and Polymorphism - creating base and derived classes, demonstrating polymorphic behavior
 6. Abstraction and Encapsulation - hiding internal details and protecting data
 7. Static Methods and Class Methods - using @staticmethod and @classmethod decorators
+
+#? Advanced Python - Threads
+1. The problem that threads solve - concurrent execution of tasks which helps a program to perform multiple operations simultaneously rather than sequentially one after the other.
+2. Creating threads with run(), start(), and join() methods.
+3. Passing arguments to threads using lambda functions.
+4. The difference between threads and processes (using multiprocessing).
+5. The difference between run() and start() methods of threads. 
+6. Creating threads using custom classes.
+7. Create and solve real world example of downloading multiple images using threads -> Refer 09-python-threads-image-downloader.py
+
+Key Differences between run(), start() and join() Methods:
+
+a) Execution Context:
+    * start() initiates the thread's execution.
+    * run() defines what the thread does.
+    * join() waits for the thread to finish.
+b) Timing:
+    * start() is typically called first, followed by join().    
+    * run() is called automatically by start().
+c) Blocking Nature:
+    * start() is non-blocking.
+    * join() is blocking, waiting for the thread to complete.
+d) Return Value:
+    * start() returns None.
+    * run() doesn't return anything directly; its contents determine the output.
+    * join() always returns None 3.
+
+In summary, start() initiates the thread, run() defines its behavior, and join() ensures the main program waits for the thread to complete before continuing. Understanding these methods is crucial for proper thread management in Python.
+
+* threading.current_thread().name is used to get the name of the current thread.
+* threading.enumerate() returns a list of all currently active running threads.
+* threading.get_ident() returns the unique identifier id of the current thread.
