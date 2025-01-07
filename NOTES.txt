@@ -235,3 +235,33 @@ Here's a concise point and subpoint-wise answer combining the information from b
     - Requires knowledge of entire structure before starting
 
 This concise overview covers the key points about Django, its benefits, and why it's preferred, while also mentioning some potential drawbacks.
+
+#? Building your first django project and application:
+
+1. Create a virtual environment using command: python3 -m venv venv
+2. Activate the virtual environment: source venv/bin/activate
+3. Install django: pip install django
+4. Create a new project: django-admin startproject myfirstproject .
+5. Create a new application: python manage.py startapp myfirstapp
+6. Run the development server: python manage.py runserver
+7. To run the development server in debug mode: python manage.py runserver --debug
+8. To run the development server in debug mode with an IP address and port: python manage.py runserver --debug 0.0.0.0:8000
+9. To create a superuser account: python manage.py createsuperuser
+10. Store requirements in requirements.txt: pip freeze > requirements.txt
+
+#? Django project and application files to know about:
+
+1. settings.py: Configuration for the Django project.
+2. urls.py: URL patterns for the Django project.
+3. wsgi.py: WSGI server configuration for the Django project.
+4. asgi.py: ASGI server configuration for the Django project.
+5. manage.py: Command-line utility for managing the Django project.
+6. models.py: Database models for the Django project.
+7. forms.py: Form definitions for the Django project.
+8. views.py: View functions for the Django project.
+9. templates: HTML templates for the Django project.
+10. static: Static files for the Django project.
+11. migrations: Database migrations for the Django project.
+12. tests: Unit and integration tests for the Django project.
+13. admin.py: Admin interface for the Django project.
+14. .env : Environment variables for the Django project.
