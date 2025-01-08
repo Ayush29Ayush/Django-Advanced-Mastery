@@ -10,6 +10,7 @@ media
 *.bak
 
 # IDE-specific #
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
