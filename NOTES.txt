@@ -285,3 +285,206 @@ This concise overview covers the key points about Django, its benefits, and why 
 7. Each app has its own static files and can be accessed from the main project.
 8. Each app has its own migrations and can be accessed from the main project.
 9. Each app has its own tests and can be accessed from the main project.
+
+Here are some key differences and comparisons between WSGI and ASGI:
+
+#? Key Points Comparing WSGI and ASGI
+
+1. Purpose:
+   - WSGI: Primarily for web servers
+   - ASGI: For asynchronous application servers
+
+2. Asynchronous Support:
+   - WSGI: Synchronous only
+   - ASGI: Supports both synchronous and asynchronous applications
+
+3. Protocol:
+   - WSGI: Uses a synchronous request-response model
+   - ASGI: Uses an asynchronous event loop model
+
+4. Framework Support:
+   - WSGI: Supported by most traditional web frameworks (Django, Flask)
+   - ASGI: Supported by newer asynchronous frameworks (FastAPI, Django Asynchronous)
+
+5. Performance:
+   - WSGI: Better suited for I/O-bound applications
+   - ASGI: More efficient for CPU-bound tasks and real-time applications
+
+6. Compatibility:
+   - WSGI: Widely supported across various web servers
+   - ASGI: Less widespread but growing in adoption
+
+7. Use Cases:
+   - WSGI: Ideal for traditional web applications
+   - ASGI: Better suited for real-time applications (chat apps, gaming platforms)
+
+8. Implementation:
+   - WSGI: Simpler implementation due to synchronous nature
+   - ASGI: More complex implementation due to asynchronous nature
+
+9. Future-Proofing:
+   - WSGI: May become outdated as more applications require real-time features
+   - ASGI: Better positioned for future web application needs
+
+10. Learning Curve:
+    - WSGI: Easier to learn and implement
+    - ASGI: Steeper learning curve due to asynchronous concepts
+
+In summary, while WSGI remains relevant for traditional web applications, ASGI is becoming increasingly important for modern, high-performance web applications that require real-time features and efficient handling of concurrent requests.
+
+Here are some key points comparing Daphne and Gunicorn:
+
+#? Daphne vs Gunicorn
+
+1. Purpose:
+   - Daphne: ASGI server primarily for running Django Channels
+   - Gunicorn: WSGI server for running traditional Django applications
+
+2. Protocol Support:
+   - Daphne: Supports HTTP/1.1, HTTP/2, and WebSockets
+   - Gunicorn: Supports WSGI (not ASGI)
+
+3. Use Cases:
+   - Daphne: Ideal for real-time applications and WebSocket-based projects
+   - Gunicorn: Better for traditional web applications with synchronous requests
+
+4. Performance:
+   - Daphne: Optimized for real-time and WebSocket applications
+   - Gunicorn: Generally faster for standard WSGI applications
+
+5. Integration:
+   - Daphne: Designed to work with Django Channels
+   - Gunicorn: Works with standard Django projects
+
+6. Configuration:
+   - Daphne: Simpler configuration focused on ASGI support
+   - Gunicorn: More flexible configuration options for WSGI servers
+
+7. Learning Curve:
+   - Daphne: Steeper learning curve due to real-time features
+   - Gunicorn: Easier to learn and use for traditional web apps
+
+8. Compatibility:
+   - Daphne: Primarily used with Django Channels
+   - Gunicorn: Compatible with various Python web frameworks
+
+9. Scalability:
+   - Daphne: Good for scaling real-time applications
+   - Gunicorn: Well-suited for scaling traditional web applications
+
+10. Market Position:
+    - Daphne: Growing in popularity for real-time Django applications
+    - Gunicorn: Established as a standard WSGI server for Django projects
+
+In summary, Daphne is specialized for real-time applications and WebSocket support, while Gunicorn remains a versatile choice for traditional Django web applications. The choice between them depends on the specific requirements of your project, particularly whether real-time features are needed.
+
+#! Understanding URL's and Views
+
+#? Understanding URL's and Views in Django
+1. Views are the python functions or classes that handle HTTP requests and return HTTP responses.
+2. URLs map HTTP requests to views.
+3. URLs are defined in the application's urls.py file which are then used in the project's urls.py file.
+4. URLs can be defined using regular expressions or string patterns.
+5. Views are defined in the application's views.py file.
+6. Views are responsible for performing logic like rendering templates, processing forms, returning JSON responses, etc.
+7. Views are associated with URLs using URL patterns.
+
+#? Building Dynamic URL Patterns in Django
+Example of building a dynamic URL pattern: 
+   * http://domain.com/contact/<int:contact_id> where contact_id is an dynamic integer parameter according to which lets say tables will be plotted and data will be fetched
+
+#TODO Approach - 1:
+
+* Define a URL pattern with a dynamic parameter. 
+** urls.py **
+"
+path('dynamic_route/<int:number>', dynamic_route, name='dynamic_route'),
+"
+** views.py **
+"
+def dynamic_route(request, number):
+    for i in range(0,10):
+        print(f"{number} * {i+1} = ", (i+1)*number)
+    return HttpResponse(f"Hello, the number is {number}")
+"
+
+#TODO Approach - 2:
+
+* Define a URL pattern with a dynamic parameter using a regular expression which will use re_path rather than path
+Here's a simple example of defining a URL pattern with a dynamic parameter using a regular expression in Django:
+** urls.py **
+
+```
+from django.urls import re_path
+from . import views
+
+urlpatterns = [
+    re_path(r'^articles/(?P<year>[0-9]{4})/$', views.year_archive),
+]
+```
+
+Key points:
+1. We use `re_path()` to allow regular expressions in our URL pattern.
+2. The regular expression `r'^articles/(?P<year>[0-9]{4})/$'` captures:
+   - `^articles/` matches the start of the URL path
+   - `(?P<year>[0-9]{4})` captures exactly 4 digits as the year
+   - `$` ensures the URL ends exactly there
+3. The captured group `<year>` will be passed as an argument to the view function.
+4. This pattern will match URLs like `/articles/2025/`.
+5. The corresponding view function would look something like:
+
+```
+def year_archive(request, year):
+      # Handle requests for articles from the specified year
+      return HttpResponse(f"Articles from {year}")
+```
+
+#! Templates and Static Files
+
+#? How to render HTML Templates and use context in Django
+1. Define a template in the templates directory.
+2. Create a context dictionary to pass data to the template in your view.
+3. Render the template using the context dictionary.
+4. Have a url pattern that maps to your view.
+
+** sample code for view **
+```
+from django.shortcuts import render
+
+def index(request):
+    # Define context dictionary
+    context = {
+        'title': 'Welcome to My Site',
+        'message': 'This is the home page',
+        'current_year': 2023,
+    }
+    
+    # Render template with context
+    return render(request, 'index.html', context)
+```
+** sample code for templates **
+```
+<h1>{{ title }}</h1>
+<p>{{ message }}</p>
+<p>Current year: {{ current_year }}</p>
+```
+
+#? Understanding Django Templates in Detail
+1. Templates are HTML files that contain placeholders for dynamic content.
+2. Context is used to pass data to the template.
+3. Some of the most used Django template tags include:
+a) {% for %} for loops
+b) {% if %} conditional statements
+c) {% extends %} to inherit from a parent template
+d) {% block %} to define a block of content that can be overridden in child templates
+e) {% static %} to reference static files
+f) {% url %} to generate URLs
+g) {% include %} to include another template
+h) {% load %} to load additional template tags
+i) {% load static %} to load static files
+j) {% load i18n %} to load translation files
+k) {% load crispy_forms_tags %} to load crispy forms tags
+l) {% csrf_token %} to generate a CSRF token for forms protection
+m) {% now %} to get the current date and time
+n) {% comment %} to add comments in the template
+o) {% endcomment %} to end comments in the template
