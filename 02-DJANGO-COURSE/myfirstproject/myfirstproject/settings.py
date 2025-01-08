@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "myfirstapp",
 ]
 
 MIDDLEWARE = [
@@ -67,7 +68,8 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "myfirstproject.wsgi.application"
+# WSGI_APPLICATION = "myfirstproject.wsgi.application"
+ASGI_APPLICATION = "myfirstproject.asgi.application"
 
 
 # Database
