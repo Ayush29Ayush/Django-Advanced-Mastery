@@ -473,18 +473,20 @@ def index(request):
 1. Templates are HTML files that contain placeholders for dynamic content.
 2. Context is used to pass data to the template.
 3. Some of the most used Django template tags include:
-a) {% for %} for loops
-b) {% if %} conditional statements
+a) {% for %} and {% endfor %} for loops
+b) {% if %} and {% else %} for conditional statements
 c) {% extends %} to inherit from a parent template
-d) {% block %} to define a block of content that can be overridden in child templates
-e) {% static %} to reference static files
+d) {% block %} and {% endblock %} to define a block of content that can be overridden in child templates
+e) {% with %} to create a temporary context
 f) {% url %} to generate URLs
 g) {% include %} to include another template
-h) {% load %} to load additional template tags
-i) {% load static %} to load static files
+h) {{ | }} is pipe operator used to manipulate data, for example {{ user.first_name|upper }} or {{ users|length }} where users will be a list of users
+i) {% load static %} to load and serve static files
 j) {% load i18n %} to load translation files
 k) {% load crispy_forms_tags %} to load crispy forms tags
 l) {% csrf_token %} to generate a CSRF token for forms protection
 m) {% now %} to get the current date and time
-n) {% comment %} to add comments in the template
-o) {% endcomment %} to end comments in the template
+n) {% comment %} and {% endcomment %} to add comments in the template
+
+For more, refer => "https://docs.djangoproject.com/en/5.1/ref/templates/builtins/"
+You can also create your own custom template tags, refer => "https://docs.djangoproject.com/en/5.1/howto/custom-template-tags/"
