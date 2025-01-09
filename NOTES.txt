@@ -490,3 +490,55 @@ n) {% comment %} and {% endcomment %} to add comments in the template
 
 For more, refer => "https://docs.djangoproject.com/en/5.1/ref/templates/builtins/"
 You can also create your own custom template tags, refer => "https://docs.djangoproject.com/en/5.1/howto/custom-template-tags/"
+
+#! Database Setup in Django
+
+Django has support for several popular databases, including:
+a) MySQl
+b) PostgreSQL
+c) SQLite
+
+1. For now we will be using PostgreSQL, I am using Linux so we need to install PostgreSQL, its dependecies and pgAdmin
+a) For PostgreSQL: "https://www.postgresql.org/download/linux/ubuntu/" and follow the steps under "To manually configure the Apt repository, follow these steps"
+b) For pgAdmin: "https://www.pgadmin.org/download/pgadmin-4-apt/" and follow the steps under "To use this repository, run the following commands"
+
+#TODO - Installation Guide for PostgreSQL and pgAdmin => "https://www.youtube.com/watch?v=UGfteFq_6Co"
+
+2. Now we will setup our database with our Django project but before that, create a database and set that in NAME variable under DATABASES in settings.py
+a) For SQLite:
+```
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
+    }
+}
+```
+b) For PostgreSQL: Download PostgreSQL Client using command "pip install psycopg2-binary"
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'your_database_name',
+        'USER': 'your_database_user',
+        'PASSWORD': 'your_password',
+        'HOST': 'localhost', 
+        'PORT': '5432',
+    }
+}
+```
+c) For MySQL: Download MySQL Client using command "pip install mysqlclient"
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'your_database_name',
+        'USER': 'your_database_user',
+        'PASSWORD': 'your_password',
+        'HOST': 'localhost', 
+        'PORT': '3306',
+    }
+}
+```
+
+3. Now we will run Django command "python3 manage.py migrate" to migrate our database.
