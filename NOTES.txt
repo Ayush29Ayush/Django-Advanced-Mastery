@@ -792,3 +792,69 @@ c) In view, use form.cleaned_data to access form data and is_valid() to check if
 d) In view, use form.save() to save form data to database if the form is valid which will raise exception if form is invalid
 e) If not using django forms and directly using HTML forms, get all the data from the request.POST and save it to the database using Model_name.objects.create()
 
+#! Django Models Level 2 (Advanced)
+
+#TODO Create vs Save vs Get_Or_Create method in Django (Interview Question)
+
+Here are the key points comparing Create, Save, and Get_or_Create methods in Django:
+
+#? Create Method
+
+1. Usage:
+   - `Model.objects.create(**kwargs)`
+   - Creates a new object and saves it to the database in one step
+
+2. Advantages:
+   - More concise and readable for simple object creation
+   - Automatically handles saving the new object
+
+3. Behavior:
+   - Always performs an INSERT operation
+   - Returns the newly created object instance
+
+4. Use cases:
+   - Handling form submissions
+   - Data imports where data is ready to save immediately
+
+#?  Save Method
+
+1. Usage:
+   - `object.save()`
+   - Saves an existing object instance to the database
+
+2. Advantages:
+   - Used when you already have an object instance
+   - Allows for custom logic before saving
+
+3. Behavior:
+   - Performs either INSERT (new object) or UPDATE (existing object)
+   - Requires manual object instantiation
+
+4. Use cases:
+   - Modifying existing objects instance
+   - Custom validation before saving
+
+#? Get_or_Create Method
+
+1. Usage:
+   - `Model.objects.get_or_create(**kwargs)`
+   - Attempts to retrieve an object matching the kwargs, creating it if not found
+
+2. Advantages:
+   - Combines retrieval and creation in one step
+   - Useful for ensuring object existence before use
+
+3. Behavior:
+   - First tries to get an existing object
+   - If not found, creates and saves a new object
+
+4. Use cases:
+   - Ensuring object exists before use (e.g., in views)
+   - Optimizing database queries
+
+Key differences:
+- Create always creates new objects
+- Save works on existing objects instance or new ones
+- Get_or_Create retrieves if possible, else creates
+
+Choose based on your specific use case and object lifecycle requirements.
