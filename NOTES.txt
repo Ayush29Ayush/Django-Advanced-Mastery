@@ -687,3 +687,108 @@ class Student(models.Model):
 
 
 * After "python3 manage.py makemigrations" run "python3 manage.py migrate", open shell using "python3 manage.py shell" and insert few dummy data in database
+
+#! Building Forms in Django
+
+Django forms has various limitations and in actual project we prefer HTML forms over django forms. For pretty django forms we should use third party packages like "django-crispy-forms". 
+
+#? Beginner's Guide to Django Forms
+
+1. Introduction to Forms:
+   - Forms are used to collect user input
+   - They consist of fields and widgets
+   - Django provides built-in form classes and widgets
+
+2. Creating a Simple Form:
+   - Import necessary modules
+   - Define form fields
+   - Create a form instance
+
+3. Rendering Forms:
+   - Use `as_p()` method to render form as paragraphs
+   - Use `as_table()` method to render form as table
+   - Use `as_ul()` method to render form as unordered list
+
+4. Handling Form Data:
+   - Access form data using `form.cleaned_data`
+   - Use `is_valid()` method to check if form is valid
+
+5. Customizing Forms:
+   - Add custom validation
+   - Set initial values
+   - Make fields required
+
+6. Form Fields:
+   - CharField: For text input
+   - IntegerField: For integer input
+   - ChoiceField: For select dropdowns
+   - DateTimeField: For date/time inputs
+   - FileField: For file uploads
+
+7. Form Widgets:
+   - Textarea for multi-line text
+   - CheckboxSelectMultiple for multiple selections
+   - SelectDateWidget for date selection
+
+8. Form Validation:
+   - Built-in validation methods
+   - Custom validation using `clean()` method
+
+9. Form Security:
+   - Use CSRF protection
+   - Prevent cross-site scripting (XSS)
+
+10. Form Types:
+   - ModelForm for working with models
+   - Form for custom forms
+
+#? HTML Forms in Django
+
+1. Basic Structure:
+```
+<form action="{% url 'view_name' %}" method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <input type="submit" value="Submit">
+</form>
+```
+
+2. Form Actions:
+   - Use `{% url %}` tag to generate URLs
+   - Specify `method` attribute (GET or POST)
+
+3. Form Fields:
+   - Text inputs: `<input type="text" name="field_name">`
+   - Checkboxes: `<input type="checkbox" name="field_name">`
+   - Radio buttons: `<input type="radio" name="field_name">`
+
+4. File Uploads:
+```
+<form enctype="multipart/form-data">
+      {{ form.as_p }}
+</form>
+```
+
+5. Form Styling:
+   - Use CSS classes for styling
+   - Customize widget appearance
+
+6. Form Submission:
+   - Handle form submission in views
+   - Process and validate form data
+
+7. Error Handling:
+   - Display validation errors
+   - Show custom error messages
+
+8. Form Libraries:
+   - jQuery Form Plugin for AJAX submissions
+   - Bootstrap Forms for responsive designs
+
+Summary:
+a) Make forms.py and use either DjangoForm or ModelForm
+b) In template use form.as_p() to render form as paragraph and use csrf token
+c) In view, use form.cleaned_data to access form data and is_valid() to check if form is valid
+d) In view, use form.save() to save form data to database if the form is valid which will raise exception if form is invalid
+e) If not using django forms and directly using HTML forms, get all the data from the request.POST and save it to the database using Model_name.objects.create()
+
