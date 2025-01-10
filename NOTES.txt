@@ -542,3 +542,148 @@ DATABASES = {
 ```
 
 3. Now we will run Django command "python3 manage.py migrate" to migrate our database.
+
+#! Django Models
+
+Here's a more detailed version of the notes on Django models, incorporating the additional information from the search results:
+
+#? Defining Models and Fields
+
+1. Model Definition:
+   - Create a class that inherits from `models.Model`
+   - Define fields as attributes of the model class
+   - Use `Meta` inner class for metadata about the model
+
+2. Common Fields:
+   - CharField: For short text strings
+   - TextField: For longer text content
+   - IntegerField: For whole numbers
+   - FloatField: For decimal numbers
+   - DateField: For dates
+   - BooleanField: For true/false values
+   - ForeignKey: For relationships with other models
+   - ManyToManyField: For many-to-many relationships
+   - ImageField: For image uploads
+   - FileField: For file uploads
+   - EmailField: For email addresses
+   - SlugField: For URL-friendly strings
+   - DurationField: For durations
+   - IPAddressField: For IP addresses
+   - GenericIPAddressField: For both IPv4 and IPv6 addresses
+   - PositiveIntegerField: For positive integers
+   - PositiveSmallIntegerField: For small positive integers
+   - PositiveFloatField: For positive floating-point numbers
+   - DateTimeField: For dates and times
+   - TimeField: For times
+   - UUIDField: For universally unique identifiers
+   - XMLField: For storing XML data
+   - JSONField: For storing JSON data
+   - BitField: For storing single boolean values in a compact way
+   - AutoField: Automatically increments for each new record
+   - BigAutoField: Similar to AutoField but uses a larger range
+   - SmallIntegerField: For small integers
+   - FilePathField: For file paths
+   - RelatedManager: For managing related objects
+
+** sample code for models.py **
+```
+from django.db import models
+
+
+class College(models.Model):
+    college_name = models.CharField(max_length=100)
+    college_address = models.CharField(max_length=100)
+
+
+class Student(models.Model):
+    gender_choices = (("Male", "Male"), ("Female", "Female"))
+    college = models.ForeignKey(
+        College, on_delete=models.CASCADE, null=True, blank=True
+    )
+    name = models.CharField(max_length=100)
+    mobile_number = models.CharField(max_length=12)
+    email = models.EmailField()
+    gender = models.CharField(max_length=10, choices=gender_choices, default="Male")
+    student_bio = models.TextField()
+    date_of_birth = models.DateField()
+    student_profile_image = models.ImageField(
+        null=True, blank=True, upload_to="student_profile_images/"
+    )
+    student_file = models.FileField(null=True, blank=True, upload_to="student_files/")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+```
+
+#? Model Relationships
+
+1. One-to-One Relationships:
+   - Use `OneToOneField` to establish a one-to-one relationship
+   - Useful for extending existing models without duplicating fields
+
+2. One-to-Many Relationships:
+   - Use `ForeignKey` field in one model to reference another model
+   - Can specify `on_delete` parameter to handle cascading deletes
+
+3. Many-to-Many Relationships:
+   - Use `ManyToManyField` to establish many-to-many relationships
+   - Can specify intermediate tables for complex relationships
+
+4. Reverse Relationships:
+   - Access related objects using `model_name_set` attribute
+   - Use `ForeignKey.related_model` to get the related model class
+
+* refer myfirstapp/firstmodels.py for more details
+
+#? ORM (Object-Relational Mapping)
+
+1. Definition:
+   - Abstraction layer between Python code and database
+   - Allows working with data as objects rather than writing SQL queries
+
+2. Benefits:
+   - Simplifies database operations
+   - Provides a consistent interface across different databases
+   - Reduces boilerplate code
+   - Improves security by reducing direct SQL injection risks
+
+3. Key Features:
+   - Automatic creation of database schema from models
+   - QuerySet API for filtering, sorting, and manipulating data
+   - Support for complex queries using Django's ORM syntax
+   - Raw SQL queries for performance-critical operations
+
+4. QuerySet:
+   - Lazy evaluation of database queries
+   - Supports chaining of methods for complex queries using Q objects
+   - Methods like `filter()`, `exclude()`, `order_by()`, etc.
+
+5. Model Managers:
+   - Custom managers can be defined to modify or extend QuerySet behavior
+   - Useful for adding custom methods to model instances
+
+6. Abstract Models:
+   - Define a base class for models with shared fields
+   - Inherit from `AbstractBaseUser` for custom user models
+
+7. Model Methods:
+   - Define methods within the model class for business logic
+   - Useful for complex validations or calculations
+
+8. Model Fields:
+   - Use `choices` parameter for field values with predefined options
+   - Implement custom validation using `clean()` method
+
+9. Model Meta Options:
+   - Specify database table name and app label
+   - Set default values for fields
+   - Configure index settings for fields
+
+10. Model Signals:
+    - Connect to signals like `pre_save`, `post_save`, etc., for model events
+    - Useful for triggering actions before or after model changes
+
+
+* After "python3 manage.py makemigrations" run "python3 manage.py migrate", open shell using "python3 manage.py shell" and insert few dummy data in database
