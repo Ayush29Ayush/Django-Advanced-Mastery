@@ -16,7 +16,7 @@ class Student(models.Model):
     email = models.EmailField()
     gender = models.CharField(max_length=10, choices=gender_choices, default="Male")
     student_bio = models.TextField()
-    date_of_birth = models.DateField()
+    date_of_birth = models.DateField(blank=True, null=True)
     student_profile_image = models.ImageField(
         null=True, blank=True, upload_to="student/"
     )
@@ -82,3 +82,9 @@ class Skills(models.Model):
 class Person(models.Model):
     person_name = models.CharField(max_length=100)
     skill = models.ManyToManyField(Skills)
+
+class Student2(models.Model):
+    name = models.CharField(max_length=100)
+    age = models.IntegerField()
+    gender = models.CharField(max_length=100, null=True, blank=True)
+    upload_file = models.FileField(null=True, blank=True, upload_to="files/")
