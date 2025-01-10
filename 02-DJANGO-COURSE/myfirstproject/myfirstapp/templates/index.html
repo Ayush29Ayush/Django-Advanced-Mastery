@@ -1,35 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Welcome to My Site</title>
-  </head>
-  <body>
-    <header>
-      <nav>
-        <ul>
-          <li>
-            <a href="{% url 'index' %}">Home</a>
-          </li>
-          <li>
-            <a href="{% url 'contact' %}">Contact</a>
-          </li>
-        </ul>
-      </nav>
-    </header>
+{% extends 'base.html' %}
 
-    <main>
-      <h1 style="color: blue;">Welcome to My Django Site</h1>
-      <p>This is the main content area.</p>
+{% block content %}
+  <main>
+    <h1 style="color: blue;">Welcome to My Django Site</h1>
+    <p>This is the main content area.</p>
 
-      {% if user.is_authenticated %}
-        <p>You are logged in as {{ user.username }}</p>
-      {% else %}
-        <p>Please log in to continue.</p>
-      {% endif %}
-    </main>
-
-    <footer>&copy; 2025 My Site</footer>
-  </body>
-</html>
+    {% if user.is_authenticated %}
+      <p>You are logged in as {{ user.username }}</p>
+    {% else %}
+      <p>Please log in to continue.</p>
+    {% endif %}
+  </main>
+{% endblock %}

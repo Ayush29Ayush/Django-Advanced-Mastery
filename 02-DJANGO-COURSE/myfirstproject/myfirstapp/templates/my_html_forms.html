@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h4>Form Submission</h4>
+      </div>
+      <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Name Field -->
+          <div class="mb-3">
+            <label for="full_name" class="form-label">Name</label>
+            <input type="text" class="form-control" id="full_name" name="full_name" placeholder="Enter your name" />
+          </div>
+
+          <!-- Age Field -->
+          <div class="mb-3">
+            <label for="age" class="form-label">Age</label>
+            <input type="number" class="form-control" id="age" name="age" min="18" max="100" placeholder="Enter your age" />
+          </div>
+
+          <!-- Gender Field -->
+          <div class="mb-3">
+            <label for="gender" class="form-label">Gender</label>
+            <select class="form-select" id="gender" name="gender">
+              <option value="">Select Gender</option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+            </select>
+          </div>
+
+          <!-- File Upload Field -->
+          <div class="mb-3">
+            <label for="upload_file" class="form-label">Upload file</label>
+            <input type="file" class="form-control" id="upload_file" name="upload_file" />
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="btn btn-primary w-100">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+{% endblock %}
