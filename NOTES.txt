@@ -859,7 +859,7 @@ Key differences:
 
 Choose based on your specific use case and object lifecycle requirements.
 
-#? Use Faker for Inserting Dummy Data into your Django Models
+#TODO Use Faker for Inserting Dummy Data into your Django Models
 
 1. pip install faker
 2. Create a seed_db.py file and write code to insert dummy data into your models
@@ -869,3 +869,504 @@ Choose based on your specific use case and object lifecycle requirements.
 4. Create a new file in your app's management/commands directory named "seeder.py"
 5. Then use command "python manage.py seeder --number=20"
 6. See your custom made commands by using "python3 manage.py"
+
+#TODO Master Django ORM Lookups: Advanced Query Techniques and Searching
+
+### 1. Chaining Queries
+
+- Allows building complex queries step-by-step
+- Enables highly specific queries while maintaining readability
+- Examples:
+  - Combining filters and ordering
+  - Chaining aggregations
+```
+users = User.objects.filter(is_active=True).exclude(email__endswith='.com').order_by('-date_joined')
+```
+
+### 2. F() Expressions
+
+- Allow performing database operations using values from the database
+- Useful for maintaining data integrity and efficient updates
+- Examples:
+  - Increasing a value
+  - Calculating discounts
+```
+User.objects.filter(age=F('current_age') + 1)
+```
+
+### 3. Q() Objects
+
+- Enable building complex queries with logical OR and AND operators
+- Useful for combining conditions dynamically
+- Examples:
+  - Constructing complex queries
+  - Dynamic search
+```
+q1 = Q(first_name__startswith='J')
+q2 = Q(last_name__endswith='sen')
+result = User.objects.filter(q1 | q2)
+```
+
+### 4. Raw SQL Queries
+
+- Allow executing raw SQL queries when needed
+- Use `raw()` method for safe execution
+- Examples:
+  - Retrieving data
+  - Updating data
+  - Mapping results to model objects
+```
+from django.db import connection
+
+with connection.cursor() as cursor:
+    cursor.execute("SELECT username, email FROM auth_user WHERE age > 30")
+    users = [User(username=row[0], email=row[1]) for row in cursor.fetchall()]
+```
+
+### 5. Advanced Query Techniques
+
+- Using `annotate()` with expressions
+- Combining multiple lookups
+- Using `values()` and `values_list()`
+- Creating custom managers
+```
+from django.db.models import F, ExpressionWrapper, DecimalField
+
+User.objects.update(age=ExpressionWrapper(F('age') + 1, output_field=DecimalField()))
+```
+
+### 6. Searching Techniques
+
+- Full-text searching
+- Complex search queries using Q() objects
+- Search with pagination
+```
+from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+
+results = Post.objects.annotate(
+    search_vector=SearchVector('title', 'content')
+).filter(search_vector=SearchQuery('Django tutorial')).order_by('-search_rank')
+```
+
+### 7. Performance Optimization
+
+- Using select_related() and prefetch_related()
+- Avoiding n+1 query problem
+- Caching strategies
+```
+posts = Post.objects.select_related('category').prefetch_related('tags')
+```
+
+### 8. Working with Dates and Times
+
+- Date range queries
+- Calculating time differences
+- Formatting dates/times
+```
+from django.utils.timezone import now
+
+recent_posts = Post.objects.filter(created_at__range=(now() - timedelta(days=7), now()))
+```
+
+These points cover various advanced techniques in Django ORM, from complex querying methods to performance optimization and specific use cases like full-text searching and working with dates.
+
+#TODO Aggregate and Annotations in Django
+
+Here are brief but detailed notes on Aggregate and Annotations in Django, organized with points and subpoints:
+
+#? Aggregate
+
+1. Definition:
+   - Performs aggregation operations on QuerySets
+   - Returns a dictionary with aggregated results
+
+2. Usage:
+   - Used with `aggregate()` method
+   - Typically used for summary statistics
+
+3. Examples:
+   - Count: `Count('id')`
+   - Sum: `Sum('price')`
+   - Avg: `Avg('price')`
+   - Min: `Min('price')`
+   - Max: `Max('price')`
+
+4. Key characteristics:
+   - Collapses entire QuerySet into a single value
+   - Cannot be chained with other QuerySet methods
+   - Useful for getting overall statistics
+
+5. Syntax:
+```
+result = Model.objects.aggregate(Sum('field'))
+```
+
+#? Annotation
+
+1. Definition:
+   - Adds computed fields to QuerySet results
+   - Returns a new QuerySet with annotated fields
+
+2. Usage:
+   - Used with `annotate()` method
+   - Can be chained with other QuerySet methods
+
+3. Examples:
+   - Count related objects: `Count('related_model')`
+   - Sum related field: `Sum('related_model__field')`
+   - Case expressions: `Case(..., When(...))`
+
+4. Key characteristics:
+   - Adds new fields to each object in the QuerySet
+   - Preserves the ability to chain with other QuerySet methods
+   - Useful for including derived fields in results
+
+5. Syntax:
+```
+books = BookData.objects.annotate(chapters_count=Count('bookchapterdata'))
+
+books = BookData.objects.annotate(total_pages=Sum('bookchapterdata__pages')) # when using foreign key
+
+books = BookData.objects.annotate(
+    popularity_status=Case(
+        When(chapters_count__gt=10, then='Popular'),
+        default='Not Popular',
+        output_field=CharField()
+    )
+)
+```
+
+# Comparison
+1. Purpose:
+   - Aggregate: Summary statistics
+   - Annotation: Derived fields for each object
+
+2. Return value:
+   - Aggregate: Single dictionary
+   - Annotation: New QuerySet with additional fields
+
+3. Chaining:
+   - Aggregate: Not chainable
+   - Annotation: Chainable with other QuerySet methods
+
+4. Use cases:
+   - Aggregate: Overall statistics, reporting
+   - Annotation: Including derived fields in results, complex queries
+
+5. Performance:
+   - Aggregate: Generally faster for large datasets
+   - Annotation: May impact performance for large datasets
+
+Both Aggregate and Annotation are powerful tools for manipulating QuerySets in Django, serving different purposes in data analysis and query construction.
+
+#TODO Subquery in Django
+
+Here are some brief but detailed notes on using subqueries in Django, with examples:
+
+#? Understanding Subqueries
+
+- A subquery is a query nested within another query
+- Allows retrieving data from one table based on results of another query
+- Useful for complex filtering, aggregation, and joining operations
+- Can lead to more concise and efficient code compared to multiple separate queries
+
+#? Key Points
+
+- Subqueries are part of `django.db.models`
+- Commonly used with `Subquery()` and `OuterRef()` objects
+- Can be used for filtering, annotating, and other query operations
+- Often more efficient than multiple separate queries
+
+#? Examples
+
+1. Filtering based on subquery:
+
+```
+from django.db.models import Subquery, OuterRef
+
+recent_posts = Post.objects.filter(published_date__gte=datetime.now()-timedelta(days=30))
+popular_authors = Author.objects.filter(post__in=Subquery(recent_posts.values('author')))
+```
+
+2. Annotating with subquery:
+
+```
+from django.db.models import Count, Subquery
+
+post_counts = Post.objects.filter(author=OuterRef('pk')).values('author').annotate(count=Count('id')).values('count')
+authors_with_post_counts = Author.objects.annotate(post_count=Subquery(post_counts))
+```
+
+3. Using subquery with exists:
+
+```
+from django.db.models import Exists, OuterRef
+
+active_users = User.objects.filter(last_login__gt=datetime.now()-timedelta(days=30))
+inactive_user_ids = User.objects.exclude(
+    Exists(active_users.filter(id=OuterRef('id')))
+).values_list('id', flat=True)
+```
+
+#? Best Practices
+
+- Use subqueries when dealing with complex relationships or aggregations
+- Prefer subqueries over multiple separate queries for efficiency
+- Combine with other Django ORM features like annotations and filters
+- Test performance impact of subqueries on your specific dataset
+
+By leveraging subqueries effectively, you can write more efficient and expressive database queries in Django.
+
+#TODO Overwrite Save() Method in Django
+
+Here are some brief but detailed notes on overriding the save() method in Django models, with examples:
+
+#? Understanding save() Method
+
+- The save() method is inherited from models.Model and is called when creating or updating a model instance
+- It's executed when saving through admin interface, shell, or other methods
+- Can be overridden to add custom behavior before or after saving to the database
+
+#? Key Points
+
+- Override save() in your model class
+- Call super().save() at the end to actually save the instance
+- Be cautious as errors in save() can prevent database saves
+
+#? Examples
+
+1. Auto-generating a slug:
+
+```
+from django.db import models
+from django.utils.text import slugify
+
+class BlogPost(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+```
+
+2. Resizing an image before saving:
+
+```
+from django.db import models
+from PIL import Image
+
+class Product(models.Model):
+    name = models.CharField(max_length=100)
+    image = models.ImageField(upload_to='products/')
+    
+    def save(self, *args, **kwargs):
+        if self.image:
+            img = Image.open(self.image.path)
+            img.thumbnail((100, 100))
+            img.save(self.image.path)
+        super().save(*args, **kwargs)
+```
+
+3. Sending email after save:
+
+```
+from django.db import models
+from django.core.mail import send_mail
+
+class Appointment(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:  # New instance
+            send_mail(
+                'New Appointment',
+                f'Name: {self.name}\nEmail: {self.email}',
+                'admin@example.com',
+                ['notifications@example.com'],
+                fail_silently=False,
+            )
+        super().save(*args, **kwargs)
+```
+
+#? Best Practices
+
+- Use signals (pre_save, post_save) instead of overriding save() when possible
+- Handle exceptions carefully in overridden save() methods
+- Consider using properties or separate methods for complex logic
+- Be aware of potential performance impacts with database operations in save()
+
+* Refer Products model in models.py and generateSlug() from my utils.py
+
+By understanding how to override the save() method, you can add custom behavior to your Django models, but use this feature judiciously as it can lead to more complex code if overused.
+
+#TODO -> Bulk Create, Bulk Update and Bulk Delete in Django
+
+#? Understanding Bulk Operations
+
+- Bulk operations allow performing multiple database operations in a single query
+- Significantly improves performance for large datasets compared to individual operations
+- Available for create, update, and delete operations
+
+#? Key Points
+
+- Use `bulk_create()`, `bulk_update()`, and `bulk_delete()` methods
+- Requires a list of model instances to operate on
+- Can specify fields to update for bulk_update()
+- Batch size can be controlled to optimize performance
+
+#? Examples
+
+1. Bulk Create:
+
+```
+new_objects = [Model(field1=value1, field2=value2) for _ in range(100)]
+Model.objects.bulk_create(new_objects)
+```
+
+2. Bulk Update:
+
+```
+objects_to_update = Model.objects.all()[:100]
+Model.objects.bulk_update(objects_to_update, ['field1', 'field2'])
+```
+
+3. Bulk Delete:
+
+```
+objects_to_delete = Model.objects.filter(condition).all()
+Model.objects.bulk_delete(objects_to_delete)
+```
+
+#? Best Practices
+
+- Use bulk operations for large sets of data to reduce database queries
+- Be cautious with bulk delete as it permanently removes data
+- Consider using transactions for atomicity in complex operations
+- Profile performance to determine optimal batch sizes
+
+#? Additional Features
+
+- `ignore_conflicts=True` for bulk_create to skip existing entries
+- `update_conflicts=True` for bulk_update to update existing entries
+- `return_id=True` for bulk_create to return created IDs
+
+* Refer bulk_operations_view from views.py
+* Refer bulk_create_brands(), bulk_update_brands() and bulk_delete_brands() from my utils.py
+* Refer bulk_operations.html from templates
+
+By leveraging bulk operations, you can significantly improve the performance of data manipulation in Django, especially when dealing with large datasets.
+
+#TODO -> Meta Class in Django
+
+Here are some brief but detailed notes on the Meta class in Django models:
+
+#? Understanding Meta Class
+
+- The Meta class is an inner class within Django model classes
+- Used to provide metadata and customization options for the model
+- Optional, but commonly used to modify model behavior
+
+#? Key Points
+
+- Located inside the model class definition
+- Provides various options to customize model behavior
+- Does not inherit from any base class
+- Accessed using model._meta syntax
+
+#? Common Meta Options
+
+1. Abstract models:
+   ```
+   class Meta:
+       abstract = True
+   ```
+
+2. Table name:
+   ```
+   class Meta:
+       db_table = 'custom_table_name'
+   ```
+
+3. Ordering:
+   ```
+   class Meta:
+       ordering = ['-date_field']
+   ```
+
+4. Permissions:
+   ```
+   class Meta:
+       permissions = (
+           ('can_view_reports', 'Can view reports'),
+       )
+   ```
+
+5. Verbose name:
+   ```
+   class Meta:
+       verbose_name = 'User Account'
+   ```
+
+6. App label:
+   ```
+   class Meta:
+       app_label = 'auth'
+   ```
+
+7. Proxy models:
+   ```
+   class Meta:
+       proxy = True
+   ```
+
+#? Best Practices
+
+- Use Meta for model-specific configurations
+- Keep Meta simple and focused on model metadata
+- Document custom Meta usage clearly
+- Be consistent across similar models
+
+#? Example
+
+```
+from django.db import models
+
+class Book(models.Model):
+    title = models.CharField(max_length=200)
+    author = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ['-title']
+        verbose_name = 'Book Title'
+        db_table = 'books_custom'
+
+    def __str__(self):
+        return self.title
+```
+
+By utilizing the Meta class effectively, you can customize and enhance your Django models, improving their functionality and readability.
+
+#TODO -> Soft Delete and Model Managers in Django
+
+1. Soft Delete: This feature allows you to mark records as deleted without permanently removing them from the database. Instead, they are marked as deleted and can be restored if needed.
+2. Model Managers: Model managers provide additional functionality for querying and manipulating your models. They can be used to perform complex queries or custom operations on your models.
+
+```
+class SkillManager(models.Manager):
+
+    def get_queryset(self) -> models.QuerySet:
+        return super().get_queryset().filter(is_deleted=False)
+
+
+class Skills(models.Model):
+    skill_name = models.CharField(max_length=100)
+    is_deleted = models.BooleanField(default=False)
+
+    objects = SkillManager() #! Setting SkillManager as default manager
+    new_manager = models.Manager() #! Creating new manager and setting old default manager here
+
+    def __str__(self):
+        return self.skill_name
+```
