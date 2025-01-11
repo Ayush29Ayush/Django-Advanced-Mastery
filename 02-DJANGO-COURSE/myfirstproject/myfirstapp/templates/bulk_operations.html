@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container-fluid mt-5">
+    <h3>Bulk Operations</h3>
+    <form method="get" action="{% url 'bulk_operations' %}">
+      <div class="row">
+        <div class="col-6">
+          <label for="bulk_operation">Select Operation</label>
+          <select name="bulk_operation" class="form-control" required>
+            <option value="" disabled selected>Select Operation</option>
+            <option value="create">Create</option>
+            <option value="update">Update</option>
+            <option value="delete">Delete</option>
+          </select>
+        </div>
+        <div class="col-6">
+          <label for="num_entries">Number of Entries</label>
+          <input type="number" name="num_entries" class="form-control" value="10" min="1" required />
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary mt-3">Execute</button>
+    </form>
+
+    {% if message %}
+      <div class="mt-4 alert alert-info">
+        <strong>Result:</strong> {{ message }}
+      </div>
+    {% endif %}
+
+    {% if error %}
+      <div class="mt-4 alert alert-danger">
+        <strong>Error:</strong> {{ error }}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
