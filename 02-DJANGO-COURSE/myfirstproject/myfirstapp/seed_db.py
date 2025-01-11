@@ -37,7 +37,7 @@ def dbSeeder(records=20) -> None:
             mobile_number=mobile_number,
             email=email,
             gender=gender,
-            # age=age,
+            age=age,
             student_bio=student_bio,
             date_of_birth=fake.date_between(start_date="-30y", end_date="-18y"),
             # student_profile_image=fake.image_path(category="avatar"),
