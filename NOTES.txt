@@ -1400,3 +1400,25 @@ Used to introduce fuzziness thus finding similar words in the database. It is a 
 Example: User will get outout if he searches for "Cement" or "Cemnt" with spelling mistake.
 
 #TODO Go to terminal and type "sudo -u postgres psql -d fulltextsearch", after logging in use "CREATE EXTENSION IF NOT EXISTS pg_trgm;" and verify its installation using "\dx"
+
+------------------------------------------------------------------------------
+
+#! Django Admin Interface
+
+#? Customizing the Django Admin
+
+* Refer admin.py from djangoadmin project
+
+#? Customizing the look and feel of the Django Admin
+
+#! Approach 1
+* pip install django-admin-interface
+* Add admin_interface and colorfield to INSTALLED_APPS
+
+#! Approach 2
+* pip install django-grappelli
+* Add grappelli to INSTALLED_APPS
+* Add "path("grappelli/", include("grappelli.urls"))," to urlpatterns
+* python3 manage.py collectstatic
+
+------------------------------------------------------------------------------
