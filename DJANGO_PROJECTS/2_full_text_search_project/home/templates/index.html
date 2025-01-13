@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <!-- noUiSlider CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.css">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .container {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-form {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-form .form-control {
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .search-form .btn-primary {
+            background-color: #6a11cb;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .search-form .btn-primary:hover {
+            background-color: #2575fc;
+        }
+
+        .price-slider-container {
+            margin-top: 1rem;
+        }
+
+        .price-slider {
+            margin: 1rem 0;
+        }
+
+        .table {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .table thead {
+            background-color: #6a11cb;
+            color: #ffffff;
+        }
+
+        .table th, .table td {
+            padding: 1rem;
+            vertical-align: middle;
+        }
+
+        .table img {
+            border-radius: 5px;
+        }
+
+        .no-results {
+            text-align: center;
+            color: #6c757d;
+            font-size: 1.2rem;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Search Form -->
+        <form method="get" class="search-form">
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <input type="text" value="{% if search %}{{search}}{% endif %}" name="search" class="form-control" placeholder="Search..." value="{{ request.GET.q }}">
+                </div>
+                <div class="col-md-4">
+                    <select name="brand" class="form-control">
+                        <option value="">Select Brand</option>
+                        {% for brand in brands %}
+                        <option {% if request.GET.brand == brand.brand %} selected {% endif %} value="{{brand.brand}}">{{brand.brand}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <select name="category" class="form-control">
+                        <option value="">Select Category</option>
+                        {% for category in categories %}
+                        <option {% if request.GET.category == category.category %} selected {% endif %} value="{{category.category}}">{{category.category}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="row g-3 mt-3">
+                <div class="col-md-12 price-slider-container">
+                    <div id="price-slider" class="price-slider"></div>
+                    <input type="hidden" name="min_price" id="min-price">
+                    <input type="hidden" name="max_price" id="max-price">
+                </div>
+            </div>
+            <div class="row g-3 mt-3">
+                <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary w-100">Search</button>
+                </div>
+            </div>
+        </form>
+
+        <!-- Results Table -->
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Brand</th>
+                        <th>SKU</th>
+                        <th>Thumbnail</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for product in results %}
+                        <tr>
+                            <td>{{ product.title }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>{{ product.category }}</td>
+                            <td>${{ product.price }}</td>
+                            <td>{{ product.brand }}</td>
+                            <td>{{ product.sku }}</td>
+                            <td><img src="{{ product.thumbnail }}" alt="{{ product.title }}" width="50"></td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="no-results">No results found.</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- noUiSlider JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.5.0/nouislider.min.js"></script>
+    <!-- Custom Script -->
+    <script>
+        var priceSlider = document.getElementById('price-slider');
+
+        noUiSlider.create(priceSlider, {
+            start: [0, 1000], // Default range
+            connect: true,
+            range: {
+                'min': 0,
+                'max': 1000 // Maximum price
+            },
+            tooltips: [true, true]
+        });
+
+        priceSlider.noUiSlider.on('update', function(values, handle) {
+            // Remove the dollar sign before setting the value
+            document.getElementById('min-price').value = Math.round(values[0]);
+            document.getElementById('max-price').value = Math.round(values[1]);
+        });
+
+        // Set initial values if they exist
+        var minPrice = "{{ request.GET.min_price|default:0 }}";
+        var maxPrice = "{{ request.GET.max_price|default:1000 }}";
+        priceSlider.noUiSlider.set([minPrice, maxPrice]);
+    </script>
+</body>
+</html>
