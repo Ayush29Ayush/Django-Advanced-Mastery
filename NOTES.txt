@@ -1380,3 +1380,23 @@ class Skills(models.Model):
 3. App: Tracker
 
 ------------------------------------------------------------------------------
+
+#! Project: Full Text Search - Search Query, Search Rank and Search Vector. Also Implement TrigamSimilarity in Django
+
+1. In this project, we will develop a Full Text Search algorithm using Search Query, Search Rank and Search Vector.
+2. This will be possible only with Postgres Database as it supports search query, search rank and search vector.
+3. Rank wise searching is needed to find the most relevant results and will be much faster compared to traditional searching.
+4. We will use Django Debug Toolbar to see the time taken to execute the queries.
+
+#? Full Text Search Algorithm
+Full-text search (FTS) is a technique for searching and retrieving relevant documents based on the contents of the text. It involves three key components: the search query, which is the user's input; the search rank, which determines the relevance of each document based on factors like term frequency (TF) and inverse document frequency (IDF); and the search vector, which represents the query and documents as mathematical vectors for comparison. These elements work together to efficiently match and rank documents, using methods like TF-IDF, cosine similarity, and Boolean logic to provide accurate and relevant search results.
+
+#* Full Text Search is a smaller version of Elastic Search. Full Text Search is feasible for low end servers whereas Elastic Search is used for large scale high end servers. Elastic Search requires minimum 8gb of RAM.
+
+#TODO Add "django.contrib.postgres" to INSTALLED_APPS in settings.py
+
+#? Trigram Similarity
+Used to introduce fuzziness thus finding similar words in the database. It is a faster alternative to FTS. 
+Example: User will get outout if he searches for "Cement" or "Cemnt" with spelling mistake.
+
+#TODO Go to terminal and type "sudo -u postgres psql -d fulltextsearch", after logging in use "CREATE EXTENSION IF NOT EXISTS pg_trgm;" and verify its installation using "\dx"
