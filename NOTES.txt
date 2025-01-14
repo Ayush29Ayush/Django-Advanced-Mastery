@@ -1422,3 +1422,115 @@ Example: User will get outout if he searches for "Cement" or "Cemnt" with spelli
 * python3 manage.py collectstatic
 
 ------------------------------------------------------------------------------
+
+#! Django Middleware
+
+#? Understanding the Django Middleware Deeply and Customizing middleware in Django
+
+#? What is Middleware?
+
+- Middleware acts as a layer between the request and response cycles
+- It allows adding functionality to every request/response without modifying views
+- Middleware components are stacked and processed in order
+
+#? Key Functions of Middleware
+
+1. Filtering Requests
+   - Reject invalid or malicious requests early
+   - Example: CSRF protection middleware
+
+2. Modifying Requests/Responses  
+   - Adding data to requests
+   - Altering responses
+   - Example: Authentication middleware adds user info to requests
+
+3. Logging and Analytics
+   - Tracking request/response data
+   - Storing metrics
+   - Example: Usage tracking middleware
+
+#? Middleware Structure
+
+- Two main methods:
+  1. `__init__(get_response)` - Called once when server starts
+  2. `__call__(request)` - Called for each request/response cycle
+
+- Optional additional methods:
+  - `process_view()`
+  - `process_exception()`
+  - `process_template_response()`
+
+#? Registering Middleware
+
+- Added to `MIDDLEWARE` setting in `settings.py`
+- Order matters - affects execution sequence
+
+#? Writing Custom Middleware
+
+```
+class MyMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+    
+    def __call__(self, request):
+        # Pre-process logic
+        response = self.get_response(request)
+        # Post-process logic
+        return response
+```
+
+#? Best Practices
+
+- Keep middleware lightweight
+- Use built-ins when possible
+- Order carefully to avoid conflicts
+- Consider performance implications
+
+#? Examples
+
+1. Basic middleware:
+
+```
+class LogTimeMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+    
+    def __call__(self, request):
+        start_time = time.time()
+        response = self.get_response(request)
+        end_time = time.time()
+        print(f"Request took {end_time - start_time:.2f}s")
+        return response
+```
+
+2. Authentication middleware:
+
+```
+class AuthenticationMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+    
+    def __call__(self, request):
+        if 'user' not in request.session:
+            # Redirect to login page
+            pass
+        return self.get_response(request)
+```
+
+1) Refer djangomiddleware project
+2) Create middleware folder in project directory
+3) Inside it create __init__.py and middleware.py
+4) Create a middleware named IPBlockingMiddleware
+5) Add "djmiddleware.middleware.middleware.IPBlockingMiddleware" to INSTALLED_APPS in settings.py
+6) Write a view and url pattern to test it.
+
+------------------------------------------------------------------------------
+
+#! Project: Customizing middleware to accept custom headers
+
+1) Refer djangomiddleware project
+2) Create middleware folder in project directory
+3) Inside it create __init__.py and middleware.py
+4) Create a middleware named CheckBMPHeaderMiddleware
+5) Add "djmiddleware.middleware.middleware.CheckBMPHeaderMiddleware" to INSTALLED_APPS in settings.py
+6) Write a view and url pattern to test it.
