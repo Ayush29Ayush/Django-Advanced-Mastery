@@ -1534,3 +1534,16 @@ class AuthenticationMiddleware:
 4) Create a middleware named CheckBMPHeaderMiddleware
 5) Add "djmiddleware.middleware.middleware.CheckBMPHeaderMiddleware" to INSTALLED_APPS in settings.py
 6) Write a view and url pattern to test it.
+
+------------------------------------------------------------------------------
+
+#! Django User Authentication
+
+#? Customizing the Django User Model
+
+1) Refer djangoauthentication project
+2) In models inherit the AbstractUser class from django.contrib.auth.models
+3) In the new CustomUser model, add all the new required fields
+4) Add "AUTH_USER_MODEL = "accounts.CustomUser"" to settings.py
+5) Create a file named managers.py in the app directory and create a UserManager class inheriting from BaseUserManager
+6) Add the CustomUser model to admin.py
