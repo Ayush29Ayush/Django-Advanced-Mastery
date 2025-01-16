@@ -1547,3 +1547,55 @@ class AuthenticationMiddleware:
 4) Add "AUTH_USER_MODEL = "accounts.CustomUser"" to settings.py
 5) Create a file named managers.py in the app directory and create a UserManager class inheriting from BaseUserManager
 6) Add the CustomUser model to admin.py
+
+-------------------------------------------------------------------------------
+
+#! Django Advanced Stuff
+
+#? Mastering Django Signals: A comprehensive guide
+
+### Understanding Django Signals
+
+- Signals are a way for different parts of a Django project to communicate
+- Allow decoupled applications to react to events in other apps
+- Follow a publisher-subscriber pattern
+
+### Key Points
+
+1. Signal Types
+   - Model signals are of 4 types: pre_save, post_save, pre_delete, post_delete
+   - Request/response signals
+
+2. Signal Components
+   - Sender: Object that emits the signal
+   - Receiver: Function that responds to the signal
+
+3. Signal Flow
+   - Signal is sent by sender
+   - Receivers execute in order they were connected
+
+4. Connecting Signals
+   - Using `@receiver` decorator
+   - Manually connecting with `connect()` method
+
+5. Signal Arguments
+   - `sender`: The model class that triggered the signal
+   - `instance`: The instance of the model
+   - `**kwargs`: Additional keyword arguments
+
+### Best Practices
+
+- Use signals for decoupled communication between apps
+- Keep signal handlers lightweight
+- Order receivers carefully to avoid conflicts
+- Consider using `weak=False` for long-lived receivers
+- Use `sender` argument to ensure correct signal reception
+
+#! Project: Automate Thumbnail Creation in Django using Signals
+
+* Refer djangosignals/imageresizer project
+
+1) In models.py, refer model named ImageModel
+2) There are 4 signals: pre_save, post_save, pre_delete, post_delete
+3) There are 2 components: sender and receiver
+4) Register the models to admin and test it.
