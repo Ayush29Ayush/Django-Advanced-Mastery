@@ -1632,3 +1632,39 @@ def sendOtpToEmail(email, subject, message):
 ```
 
 3) Now refer views.py, urls.py and templates created.
+
+#? Debug your Django App like a Pro with Django Debug Toolbar
+
+#TODO => Follow the installation steps => https://django-debug-toolbar.readthedocs.io/en/latest/installation.html
+
+### What is Django Debug Toolbar?
+
+- A configurable set of panels that display various debug information about the current request/response
+- Helps understand how your application functions and identifies problems
+- Provides insights into database queries, templates, static files, etc.
+
+### Key Features
+
+1. Panels
+   - SQL Queries
+   - Settings
+   - Templates
+   - Cookies
+   - Cache
+   - Headers
+   - Stats
+
+2. Configuration
+   - Customize which panels to display
+   - Set panel order
+   - Enable/disable panels
+
+3. Integration
+   - Works with Django's development server
+   - Compatible with most web browsers
+
+### Best Practices
+
+- Use during development, not in production
+- Customize panels based on your needs
+- Familiarize yourself with all panels for effective debugging
