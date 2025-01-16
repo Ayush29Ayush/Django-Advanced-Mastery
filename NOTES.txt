@@ -1599,3 +1599,36 @@ class AuthenticationMiddleware:
 2) There are 4 signals: pre_save, post_save, pre_delete, post_delete
 3) There are 2 components: sender and receiver
 4) Register the models to admin and test it.
+
+#? Mastering Email Sending in Django
+
+We will implement a EMAIL based login system
+
+#TODO => Refer => https://www.codingforentrepreneurs.com/blog/sending-email-in-django-from-gmail
+
+1) Add this to settings.py
+```
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = "s9xGQ@example.com"
+EMAIL_HOST_PASSWORD = "password"
+```
+
+2) Create a file named emailer.py inside the app directory
+```
+from django.core.mail import send_mail
+from django.conf import settings
+
+
+def sendTestEmail(email, subject, message):
+    send_mail(subject, message, settings.EMAIL_HOST_USER, [email])
+
+
+def sendOtpToEmail(email, subject, message):
+    # send_mail(subject, message, settings.EMAIL_HOST_USER, [email])
+    print("EMAIL SENT")
+```
+
+3) Now refer views.py, urls.py and templates created.
