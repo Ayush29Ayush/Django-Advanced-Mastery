@@ -1668,3 +1668,30 @@ def sendOtpToEmail(email, subject, message):
 - Use during development, not in production
 - Customize panels based on your needs
 - Familiarize yourself with all panels for effective debugging
+
+#? Mastering Caching in Django: Boosting your apps performance
+
+* For Windows Installation => https://github.com/tporadowski/redis/releases
+* For Linux Installation => sudo apt-get install redis-server
+
+#TODO => Refer => https://docs.djangoproject.com/en/5.1/topics/cache/
+
+1) Add this to settings.py
+```
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379",
+    }
+}
+```
+
+2) Run command => python3 manage.py createcachetable
+
+3) Now refer fulltextsearch project's views
+
+4) You can observe in the django-debug-toolbar that after using cache_page(60*5) decorator, it takes almost no time to render the page and the cache field is marked in django-debug-toolbar.
+
+5) We also use cache.set and cache.get to cache data. This is done on individual fields rather than the whole page.
+
+6) We can use cache.delete to delete the cache.
