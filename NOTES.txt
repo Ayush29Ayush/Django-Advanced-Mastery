@@ -1695,3 +1695,174 @@ CACHES = {
 5) We also use cache.set and cache.get to cache data. This is done on individual fields rather than the whole page.
 
 6) We can use cache.delete to delete the cache.
+
+#? Rate Limiting in Django
+
+1) Refer djangoauthentication project, we will implement rate limiting.
+
+#? CRON Jobs in Django
+
+Here are some brief but detailed notes on CRON jobs in Django:
+
+### What are CRON Jobs?
+
+- Scheduled tasks that run automatically at specified times
+- Managed by cron daemon on Unix/Linux systems
+- Useful for periodic maintenance, reporting, backups, etc.
+
+### Django Crontab Package
+
+- django-crontab is a popular package for implementing CRON jobs in Django
+- Simplifies scheduling tasks within Django applications
+
+### Key Features
+
+1. Easy Scheduling
+   - Define CRON expressions in Django settings
+   - Run tasks at specific intervals
+
+2. Task Execution
+   - Execute Django management commands or custom functions
+   - Can access Django environment and models
+
+3. Management Commands
+   - Leverage existing Django management commands
+   - Create custom commands for CRON tasks
+
+### Implementation Steps
+
+1. Install django-crontab:
+   ```
+   pip install django-crontab
+   ```
+
+2. Add to INSTALLED_APPS:
+   ```
+   INSTALLED_APPS = [
+       # ...
+       'django_crontab',
+   ]
+   ```
+
+3. Configure CRON jobs in settings.py:
+   ```
+   CRONJOBS = [
+       ('*/5 * * * *', 'path.to.your.management.command_or_function'),
+   ]
+   ```
+
+4. Apply CRON jobs:
+   ```
+   python manage.py crontab add
+   ```
+
+### Best Practices
+
+- Use meaningful names for CRON job functions
+- Implement proper error handling in CRON tasks
+- Monitor CRON job logs for issues
+- Consider using environment variables for sensitive data
+
+### Example
+
+```
+# myapp/cron.py
+
+def send_daily_summary():
+    # Send daily summary email
+    # ...
+
+# settings.py
+CRONJOBS = [
+    ('0 0 * * *', 'myapp.cron.send_daily_summary'),
+]
+```
+
+#? Logger in Django
+
+Here are some brief but detailed notes on logging in Django:
+
+### What is Logging in Django?
+
+- Django provides a robust logging system for recording events in your application
+- Helps diagnose issues, monitor application behavior, and track performance
+- Integrates with Python's standard logging framework
+
+### Key Components
+
+1. Logger Objects
+   - Represent a source of log messages
+   - Named using dot notation (e.g., 'django.request')
+
+2. Handlers
+   - Determine what happens to log messages
+   - Examples: Console, File, Email
+
+3. Formatters
+   - Control the format of log messages
+
+4. Filters
+   - Allow fine-tuning of which messages are logged
+
+### Configuring Logging
+
+- Main configuration done in LOGGING setting
+- Uses dictConfig format
+- Extends Django's default logging configuration
+
+### Basic Logging Usage
+
+```python
+import logging
+
+logger = logging.getLogger(__name__)
+
+logger.debug("Debug message")
+logger.info("Info message")
+logger.warning("Warning message")
+logger.error("Error message")
+logger.critical("Critical message")
+```
+
+### Best Practices
+
+- Use appropriate log levels
+- Avoid logging sensitive information
+- Use structured logging for easier parsing
+- Configure logging differently for development vs. production
+
+### Example Configuration
+
+```python
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': '/path/to/django.log',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+        'myapp': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+        },
+    },
+}
+```
+
+### Advanced Concepts
+
+- Logger namespaces
+- Propagation between loggers
+- Custom filters and formatters
+- Using environment variables for dynamic configuration
+
