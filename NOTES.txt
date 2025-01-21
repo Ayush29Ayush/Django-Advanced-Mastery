@@ -1866,3 +1866,9 @@ LOGGING = {
 - Custom filters and formatters
 - Using environment variables for dynamic configuration
 
+------------------------------------------------------------------------------------------------
+
+#! Project: Web-Scraper to fetch IMDB Latest News
+
+* Go to "https://www.imdb.com/news/movie/" as this is where we will be fetching data from.
+* We will be using the combination of requests and BeautifulSoup to scrape the data from the website.
