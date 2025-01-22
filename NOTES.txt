@@ -1872,3 +1872,132 @@ LOGGING = {
 
 * Go to "https://www.imdb.com/news/movie/" as this is where we will be fetching data from.
 * We will be using the combination of requests and BeautifulSoup to scrape the data from the website.
+
+#! Integrating Elastic Search with Django
+
+#? How to create and manage indexes in Elasticsearch
+
+First we need to install elasticsearch to our linux system.
+Refer => https://www.elastic.co/guide/en/elasticsearch/reference/current/deb.html
+
+Step 1: wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+Step 2: sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
+Step 3: sudo apt-get update && sudo apt-get install elasticsearch
+Step 4: sudo systemctl enable elasticsearch
+Step 5: sudo systemctl start elasticsearch
+Step 6: sudo systemctl status elasticsearch
+Step 7: curl -X GET "localhost:9200/"
+Output for above command:
+```
+{
+  "name" : "your_node_name",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "some_uuid",
+  "version" : {
+    "number" : "7.x.x",
+    "build_flavor" : "default",
+    "build_type" : "deb",
+    "build_hash" : "some_hash",
+    "build_date" : "202x-xx-xxTxx:xx:xxZ",
+    "lucene_version" : "8.x.x",
+    "min_jvm_version" : "11",
+    "max_jvm_version" : "16",
+    "jvm" : {
+      "version" : "some_version",
+      "vm_name" : "OpenJDK",
+      "vm_version" : "some_version"
+    }
+  }
+}
+```
+Step 8: sudo nano /etc/elasticsearch/elasticsearch.yml and set all the security related settings to false.
+Step 9: sudo systemctl restart elasticsearch
+Step 10: curl -X GET "http://localhost:9200/"
+```
+{
+  "name" : "pop-os",
+  "cluster_name" : "elasticsearch",
+  "cluster_uuid" : "0SYbnxUyS9StNHqJCPNn2g",
+  "version" : {
+    "number" : "8.17.1",
+    "build_flavor" : "default",
+    "build_type" : "deb",
+    "build_hash" : "d4b391d925c31d262eb767b8b2db8f398103f909",
+    "build_date" : "2025-01-10T10:08:26.972230187Z",
+    "build_snapshot" : false,
+    "lucene_version" : "9.12.0",
+    "minimum_wire_compatibility_version" : "7.17.0",
+    "minimum_index_compatibility_version" : "7.0.0"
+  },
+  "tagline" : "You Know, for Search"
+}
+```
+
+#TODO => Refer => https://django-elasticsearch-dsl.readthedocs.io/en/latest/quickstart.html#install-and-configure
+
+0) Create a seeder.py custom command which will seed the database with product and tag data from the dummyjson API and Faker if no data
+1) pip install django-elasticsearch-dsl
+2) Add "django_elasticsearch_dsl" to INSTALLED_APPS
+3) Add the following to settings.py
+```
+ELASTICSEARCH_DSL={
+    'default': {
+        'hosts': 'http://localhost:9200',
+    }
+}
+```
+4) In the app, after defining models create documents.py
+
+5) When we need to push data to elasticsearch server?
+   a) Scenarios:
+      1) When elasticsearch server is empty and we need to transfer data from database to elasticsearch
+      2) When we need to update data in elasticsearch
+      3) When we need to delete data from elasticsearch
+      4) When there are changes in database and we need to update elasticsearch
+
+6) python3 manage.py search_index 
+```
+(venv) ayush@pop-os:~/Desktop/Django-Advanced-Mastery/DJANGO_PROJECTS/4_elastic_search_project$ python3 manage.py search_index 
+CommandError: No action specified. Must be one of '--create','--populate', '--delete' or '--rebuild' .
+```
+7) python3 manage.py search_index --rebuild
+8) Now go to browser and type "localhost:9200/" and "http://localhost:9200/products/_search?q=*:*"
+9) "http://localhost:9200/products/_search?q=dell"
+```
+{
+  "took": 31,
+  "timed_out": false,
+  "_shards": {
+    "total": 1,
+    "successful": 1,
+    "skipped": 0,
+    "failed": 0
+  },
+  "hits": {
+    "total": {
+      "value": 1,
+      "relation": "eq"
+    },
+    "max_score": 4.83927,
+    "hits": [
+      {
+        "_index": "products",
+        "_id": "82",
+        "_score": 4.83927,
+        "_source": {
+          "brand_name": {
+
+          },
+          "title": "New DELL XPS 13 9300 Laptop",
+          "description": "The New DELL XPS 13 9300 Laptop is a compact and powerful device, featuring a virtually borderless InfinityEdge display and high-end performance for various tasks.",
+          "category": "laptops",
+          "price": 1499.99,
+          "brand": "Dell",
+          "sku": "XBJJ446X",
+          "thumbnail": "https://cdn.dummyjson.com/products/images/laptops/New%20DELL%20XPS%2013%209300%20Laptop/thumbnail.png"
+        }
+      }
+    ]
+  }
+}
+```
