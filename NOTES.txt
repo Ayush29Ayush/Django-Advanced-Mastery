@@ -1812,7 +1812,7 @@ Here are some brief but detailed notes on logging in Django:
 
 ### Basic Logging Usage
 
-```python
+```
 import logging
 
 logger = logging.getLogger(__name__)
@@ -1833,7 +1833,7 @@ logger.critical("Critical message")
 
 ### Example Configuration
 
-```python
+```
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -2009,3 +2009,163 @@ CommandError: No action specified. Must be one of '--create','--populate', '--de
 #! Project: Building an API to fetch data from elasticsearch
 
 * Refer 4_elastic_search_project in the DJANGO_PROJECTS folder
+
+#? Introduction to Celery
+
+#! Getting Started with Celery: Background Tasks and Task Queues in Django
+
+### What is Celery?
+
+- Distributed task queue for Python
+- Background Task Manager
+- Allows running tasks asynchronously in the background
+- Improves application responsiveness and scalability
+
+### Key Components
+
+1. Celery Worker
+   - Executes tasks asynchronously
+   - Runs as a separate process
+
+2. Message Broker
+   - Handles task distribution (e.g., RabbitMQ, Redis)
+
+3. Celery Application
+   - Configures connection to message broker
+   - Defines tasks
+
+### Setting Up Celery in Django
+
+1. Install Celery:
+   ```
+   pip install celery[redis]
+   ```
+
+2. Create Celery app instance:
+   ```
+   from celery import Celery
+
+   celery_app = Celery('your_project_name')
+   celery_app.config_from_object('django.conf:settings', namespace='CELERY')
+   celery_app.autodiscover_tasks()
+   ```
+
+3. Configure in settings.py:
+   ```
+   CELERY_BROKER_URL = 'redis://localhost:6379'
+   CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+   ```
+
+4. Create tasks.py in your app:
+   ```
+   @celery_app.task
+   def my_background_task(arg1, arg2):
+       # Task logic here
+   ```
+
+### Running Celery Workers
+
+- Start worker:
+  ```
+  celery -A your_project_name worker --loglevel=info
+  ```
+
+### Best Practices
+
+- Use async tasks for CPU-bound operations
+- Handle exceptions in tasks
+- Use task timeouts
+- Monitor worker status
+
+### Example: Sending Email in Background
+
+```
+from django.core.mail import send_mail
+from celery_app.tasks import send_email_async
+
+def register_user(request):
+    # ... user creation logic ...
+    send_email_async.delay(user.email, 'Welcome!')
+    return redirect('success_page')
+```
+
+### Advantages
+
+- Improved application responsiveness
+- Better resource utilization
+- Scalable task processing
+
+#! Building a Task Scheduler in Celery
+
+#TODO => Refer => https://docs.celeryq.dev/en/latest/django/first-steps-with-django.html
+
+All the code snippets are from the above documentation link
+
+1) pip install celery
+2) In the project folder, create a celery.py file and add the following code:
+```
+import os
+
+from celery import Celery
+
+# Set the default Django settings module for the 'celery' program.
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'scraper.settings')
+
+app = Celery('scraper')
+
+# Using a string here means the worker doesn't have to serialize
+# the configuration object to child processes.
+# - namespace='CELERY' means all celery-related configuration keys
+#   should have a `CELERY_` prefix.
+app.config_from_object('django.conf:settings', namespace='CELERY')
+
+# Load task modules from all registered Django apps.
+app.autodiscover_tasks()
+
+
+@app.task(bind=True, ignore_result=True)
+def debug_task(self):
+    print(f'Request: {self.request!r}')
+```
+3) In the project's __init__.py file, add the following line:
+```
+# This will make sure the app is always imported when
+# Django starts so that shared_task will use this app.
+from .celery import app as celery_app
+
+__all__ = ('celery_app',)
+```
+4) In the project's settings.py file, add the following line:
+```
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+```
+5) In the app folder, create a tasks.py file and add any example tasks:
+```
+from celery import shared_task
+import time
+
+
+@shared_task
+def add(x, y):
+    time.sleep(5)
+    return x + y
+```
+6) To boot up your celery server, use command: celery -A scraper worker --loglevel=info
+7) Create views using celery tasks and url patterns to test it
+
+#! Monitoring Celery Tasks
+1. For monitoring, we will use flower => pip install flower
+2. Use "celery -A scraper flower"
+3. Open http://localhost:5555 in your browser
+
+4. We can also use django-celery-result => pip install django-celery-results
+5. Add it to INSTALLED_APPS in settings.py => "django_celery_results"
+6. Add the following code to settings.py
+"
+CELERY_RESULT_BACKEND = 'django-db'
+"
