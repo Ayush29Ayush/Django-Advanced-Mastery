@@ -7,22 +7,6 @@ import uuid
 from django.conf import settings
 from home.tasks import download_image
 
-# def download_image(image_url, folder_path, image_name):
-#     if not os.path.exists(folder_path):
-#         os.makedirs(folder_path)
-
-#     image_path = os.path.join(folder_path, image_name)
-
-#     response = requests.get(image_url, stream=True)
-#     if response.status_code == 200:
-#         with open(image_path, "wb") as f:
-#             for chunk in response.iter_content(chunk_size=1024):
-#                 f.write(chunk)
-#         return image_path
-#     else:
-#         return None
-
-
 def scrape_imdb_news():
     url = "https://www.imdb.com/news/movie/"
     headers = {
@@ -42,15 +26,14 @@ def scrape_imdb_news():
         if image_tag:
             image_url = image_tag["src"]  # Extract the image URL from the 'src' attribute
             image_name = f"image_{uuid.uuid4()}.jpg"
-            folder_path = os.path.join(settings.MEDIA_ROOT, 'imdb_images_downloads') # Use MEDIA_ROOT to save images under the 'media/imdb_images_downloads' folder
-            # image_path = download_image(image_url=image_url,folder_path=folder_path,image_name=image_name)
-            image_path = download_image.delay(image_url=image_url,folder_path=folder_path,image_name=image_name)
-            print(f"Downloaded image: {image_path}")
+            folder_path = os.path.join(settings.MEDIA_ROOT, 'imdb_images_downloads')  # Folder to store images
+
+            # Asynchronously download the image with Celery
+            image_task = download_image.delay(image_url=image_url, folder_path=folder_path, image_name=image_name)
+
             image_field_value = image_url
-            image_path_field_value = os.path.join('imdb_images_downloads', os.path.basename(image_path)) if image_path else None
         else:
             image_field_value = None
-            image_path_field_value = None
 
         if title_tag:
             title = title_tag.text.strip() if title_tag else "No title"
@@ -60,13 +43,24 @@ def scrape_imdb_news():
             external_link = None
 
         description = description.text.strip() if description else "No description"
-        
+
+        # Save the initial news item with the original image URL (not the image path)
         news = {
             "title": title,
             "description": description,
-            "image": image_field_value,
-            "image_path": image_path_field_value,
+            "image": image_field_value,  # Storing the original image URL
             "external_link": external_link,
         }
 
-        News.objects.create(**news)
+        news_instance = News.objects.create(**news)
+
+        # Once the image is downloaded, update the image_path field in the database
+        if image_task:
+            # You can now track the completion of the task (you can also add some retry logic if needed)
+            image_path = image_task.get()  # Get the result from the task (the path of the saved image)
+            
+            # After the image is downloaded, update the `image_path` in the model
+            if image_path:
+                news_instance.image_path = os.path.join('imdb_images_downloads', os.path.basename(image_path))
+                news_instance.save()  # Save the updated model
+
