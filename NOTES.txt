@@ -2326,3 +2326,34 @@ PeriodicTask.objects.update_or_create(
 ```
 
 6) Go to admin panel and check the periodic tasks there.
+
+7) Final commands to run:
+   * python3 manage.py runserver
+   * celery -A scraper worker --loglevel=info
+   * celery -A scraper beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+#? Django with RabbitMQ
+
+Ques) What is RabbitMQ?
+
+Ans) RabbitMQ is an open-source message broker that implements the Advanced Message Queuing Protocol (AMQP). It is a popular choice for building distributed messaging systems and microservices.
+It follows the principle of "publish-subscribe" where messages are published to a queue and consumed by one or more subscribers. "FIFO" mechanism is used to ensure that messages are processed in the order they are published.
+
+1. RabbitMQ revolves around 2 things:
+   * Producer - Publishes messages to a queue
+   * Consumer - Consumes messages from a queue
+
+2. In our project, we will use our django application as a producer. For this check producer.py file.
+
+3. For consumer, it can be any other service which consumes the messages from the queue, like a microservice. It can be made using a FastAPI or any other framework. For now we will just create a consumer.py file and run it manually.
+Type command: "python3 consumer.py" so that it will act as a consumer server and be up and running.
+
+** Go to "https://www.cloudamqp.com/" and create a new RabbitMQ instance. Then go to overview and copy the URL string from the AMQP details section. Click on the "OVERVIEW" button to open the monitoring page where you can see the instance details and graphs.
+
+#! Project: AUtomate Excel Creation in Django using RabbitMQ
+
+* Refer 5_rabbitmq_project in the DJANGO_PROJECTS folder
+
+Commands to run:
+   * python3 manage.py runserver
+   * python3 rabbitmq_consumer.py
