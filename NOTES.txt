@@ -2169,3 +2169,160 @@ def add(x, y):
 "
 CELERY_RESULT_BACKEND = 'django-db'
 "
+
+#! Mastering Celery Beat: A Comprehensive Guide to Periodic Scheduling
+
+Here are some brief but detailed notes on mastering Celery Beat for periodic scheduling:
+
+### What is Celery Beat?
+
+- Part of Celery ecosystem for scheduling tasks
+- Allows running tasks at regular intervals or based on cron expressions
+- Integrates with Django ORM for database-backed schedules
+
+### Key Components
+
+1. Schedules
+   - IntervalSchedule: Defines fixed time intervals
+   - CrontabSchedule: Uses cron-like syntax for complex timing
+
+2. PeriodicTasks
+   - Models representing scheduled tasks
+   - Stored in the database
+
+3. Celery Beat Service
+   - Runs periodically to execute scheduled tasks
+
+### Setting Up Celery Beat
+
+1. Install django-celery-beat:
+   ```
+   pip install django-celery-beat
+   ```
+
+2. Add to INSTALLED_APPS:
+   ```
+   INSTALLED_APPS = [
+       # ...
+       'django_celery_beat',
+   ]
+   ```
+
+3. Configure in settings.py:
+   ```
+   CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers.DatabaseScheduler'
+   ```
+
+### Creating Periodic Tasks
+
+1. Create schedules:
+   ```
+   from django_celery_beat.models import IntervalSchedule, CrontabSchedule
+
+   schedule, created = IntervalSchedule.objects.get_or_create(
+       every=10,
+       period=IntervalSchedule.MINUTES
+   )
+   ```
+
+2. Create periodic tasks:
+   ```
+   from django_celery_beat.models import PeriodicTask
+
+   PeriodicTask.objects.create(
+       interval=schedule,
+       name='My Task',
+       task='myapp.tasks.my_task_function',
+   )
+   ```
+
+### Best Practices
+
+- Use meaningful names for tasks
+- Handle exceptions in scheduled tasks
+- Monitor Celery Beat logs
+- Consider using environment variables for sensitive data
+
+### Example Configuration
+
+```
+CELERY_BEAT_SCHEDULE = {
+    'my-task': {
+        'task': 'myapp.tasks.my_task_function',
+        'schedule': 60.0,  # Run every minute
+    },
+}
+```
+
+### Advanced Concepts
+
+- Task arguments and keyword arguments
+- Expiration times for tasks
+- Disabling/enabling tasks dynamically
+- Using Django Admin interface for task management
+
+#TODO => Refer => https://pypi.org/project/django-celery-beat/
+#TODO => Refer => https://docs.celeryq.dev/en/latest/userguide/periodic-tasks.html
+#TODO => Refer => https://django-celery-beat.readthedocs.io/en/latest/
+
+1) pip install django-celery-beat
+2) Add "django_celery_beat" to INSTALLED_APPS in settings.py
+3) Migrate => python3 manage.py migrate django_celery_beat
+4) Add the following code to settings.py
+```
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+```
+5) You can just boot up the celery beat => celery -A [project-name] beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+
+#! Approach 1 to create periodic task
+
+a) Go to settings.py and add the following code:
+```
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+CELERY_BEAT_SCHEDULE = {
+    'add': {
+        'task': 'home.tasks.add',
+        'schedule': 60.0,  # Run every minute
+        'args': (16, 16),
+    },
+}
+```
+
+#! Approach 2 to create periodic task
+a) Go to tasks.py and add the following code:
+```
+@shared_task
+def create_user_info():
+    name = fake.name()
+    email = fake.email()
+    password = fake.password()
+    age = random.randint(10, 30)  
+    
+    gender_choices = ['M', 'F', 'O', 'P']
+    gender = random.choice(gender_choices)
+    
+    user_info = UserInfo.objects.create(name=name,email=email,password=password,age=age,gender=gender)
+    
+    return f"User Info created with ID: {user_info.id}"
+
+
+# You can choose between a specific set of periods:
+# IntervalSchedule.DAYS
+# IntervalSchedule.HOURS
+# IntervalSchedule.MINUTES
+# IntervalSchedule.SECONDS
+# IntervalSchedule.MICROSECONDS
+schedule, created = IntervalSchedule.objects.get_or_create(
+    every=1,
+    period=IntervalSchedule.MINUTES
+)
+
+PeriodicTask.objects.update_or_create(
+    interval = schedule,
+    name = "Create UserInfo",
+    task = "home.tasks.create_user_info",
+)
+```
+
+6) Go to admin panel and check the periodic tasks there.
