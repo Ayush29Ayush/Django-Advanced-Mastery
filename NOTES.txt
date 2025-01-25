@@ -2601,4 +2601,15 @@ Creating docker_project_web_1 ... done
 Attaching to docker_project_db_1, docker_project_web_1
 ```
 
+Summary of Key Terms:
+   * Dockerfile: A script used to build a Docker image.
+   * Docker Image: A blueprint for creating containers, built using a Dockerfile.
+   * Docker Container: A running instance of a Docker image.
+   * docker-compose.yml: A configuration file used to define and run multi-container Docker applications with Docker Compose.
+
+Simple flow:
+   * Write a Dockerfile (build an image).
+   * Run docker-compose.yml (manage containers with services).
+
+
 ------------------------------------------------------------------------------------------------------------------------------------
