@@ -1,0 +1,27 @@
+version: "3.8"
+
+services:
+  db:
+    image: postgres:13 # You can specify the version of the postgres image here
+    restart: always
+    volumes:
+      - docker_django_postgres_data:/var/lib/postgresql/data # Persistent volume for PostgreSQL data
+    environment:
+      POSTGRES_DB: django_postgres_database # The name of the database Django will use
+      POSTGRES_USER: postgres # The PostgreSQL user
+      POSTGRES_PASSWORD: Ab@123456 # The password for the PostgreSQL user
+    ports:
+      - "5433:5432" # Expose PostgreSQL on port 5433 to avoid conflicts
+
+  web:
+    build: . # Build the Django container from the Dockerfile in the current directory
+    command: python manage.py runserver 0.0.0.0:8000 # Run the Django development server on all interfaces, on port 8000
+    volumes:
+      - .:/code # Mount the current directory (where your app code is) into the /code folder in the container
+    ports:
+      - "8000:8000" # Expose Django on port 8000
+    depends_on:
+      - db # Make sure the web service starts after the db service is ready
+
+volumes:
+  docker_django_postgres_data: # Named volume for persistent PostgreSQL data
