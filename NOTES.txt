@@ -2357,3 +2357,49 @@ Type command: "python3 consumer.py" so that it will act as a consumer server and
 Commands to run:
    * python3 manage.py runserver
    * python3 rabbitmq_consumer.py
+
+----------------------------------------------------------------------
+
+#? Load Testing in Django using Locust
+
+#! Load Testing in Django using Locust
+
+* Refer locustproject
+
+Steps:
+   * Setup your Django project and application
+   * Create a custom seeder command and seed database using faker package
+   * pip install locust
+   * Create a locustfile.py file in the root of the project
+   * To run locust: locust -f locustfile.py
+   * In browser, go to "http://127.0.0.1:8089/" and set the required parameters and run the test.
+
+** locustfile.py **
+```
+from locust import HttpUser, task , between
+from faker import Faker
+import random
+fake = Faker()
+
+class WebsiteUser(HttpUser):
+
+    @task(5)
+    def get_products(self):
+        self.client.get('/api/products/')
+
+    @task(3)
+    def submit_feedback(self):
+        payload = {
+            "name" : fake.name(),
+            "email" : fake.email(),
+            "message" : fake.text()
+        }
+        self.client.post('/api/submit-feedback/', json=payload)
+
+    @task(2)
+    def get_details(self):
+        product_id = random.randint(1, 500)
+        self.client.get(f'/api/products/{product_id}/')
+```
+
+----------------------------------------------------------------------
