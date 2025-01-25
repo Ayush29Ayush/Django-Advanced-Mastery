@@ -2403,3 +2403,202 @@ class WebsiteUser(HttpUser):
 ```
 
 ----------------------------------------------------------------------
+
+#? Using Kafka in Django
+
+#! What is Kafka and Zookeeper? A complete introduction
+
+1) In Delivery services, we need to track the delivery of packages and the location of the vehicle. This is achieved using Kafka because Kafka is a real-time streaming platform which streams data in real-time.
+2) Kafka is very powerful when compared to web-sockets as it can handle millions of requests per second and provide lots of features.
+3) Kafka is a distributed event streaming platform used for building real-time data pipelines and streaming applications. It’s designed to handle large volumes of data by enabling the efficient transmission of records (events, messages, logs, etc.) between systems.
+
+Key features:
+   * Scalable and fault-tolerant: Kafka is built to scale horizontally and handle large data loads with high availability.
+   * Distributed: Kafka operates as a cluster of servers (brokers), storing streams of records across different partitions.
+   * Real-time: It processes data in real time, making it ideal for applications requiring low-latency data ingestion and analysis (e.g., log aggregation, monitoring, event-driven architectures).
+   * Publish/Subscribe model: Producers send data to topics, and consumers read from these topics.
+
+It’s widely used in areas like log aggregation, real-time analytics, and event-driven microservices.
+
+4) Kafka has lots of things like:
+   * topic - a collection of messages or data. They are identified by a category or feed name to which messages are published. Each topic contains a stream of records.
+   * partition - a collection of messages within a topic from where we can pull data. A sub-division of a topic. Partitions allow Kafka to scale horizontally by distributing data across multiple brokers. Each partition is an ordered, immutable sequence of messages.
+   * producer - a service which produces data. A client application that sends records (messages) to a Kafka topic.
+   * consumer - a service which consumes data. A client application that reads records from a Kafka topic.
+   * broker - a server inside cluster which stores data. A Kafka server (node) that stores data and serves consumers and producers. A Kafka cluster is made up of multiple brokers.
+   * offset - a unique identifier for each partition. A unique identifier (number) for each record within a partition. It represents the position of a record in a partition.
+   * replication - The process of duplicating data across multiple brokers to ensure fault tolerance. Each partition can have replicas stored on different brokers.
+   * redention - The process of determining how long Kafka retains records in a topic. Records are retained for a specified time period or until the storage space limit is reached.
+   * stream - A continuous flow of records in Kafka, often processed in real time using Kafka Streams (an API for stream processing).
+
+5) Zookeeper is a distributed coordination service that Kafka uses to manage and maintain the distributed state of the Kafka cluster. 
+
+It helped with tasks like:
+
+   * Broker coordination: Zookeeper tracked which brokers were part of the Kafka cluster and which topics/partitions they were responsible for.
+   * Leader election: Zookeeper helped elect a leader for each partition to ensure that there was a single source of truth for writing and reading data from that partition.
+   * Cluster metadata management: It stored the metadata related to the Kafka brokers, topics, and partitions to help other brokers and consumers discover cluster information.
+   * Fault tolerance: Zookeeper helped Kafka detect broker failures and take necessary actions like leader re-election for partitions.
+
+In summary, Zookeeper was crucial for coordination in Kafka clusters.
+
+For example, a group of clusters is made which is assigned to Zookeeper and the leader of the group is elected by Zookeeper. This leader is responsible for the coordination and management of the Kafka cluster.
+
+
+----------------------------------------------------------------------To be continued----------------------------------------------------------------------
+
+#? Dockerising Django Application
+
+#! What is Docker and installing Docker
+
+Here are some brief but detailed notes on Docker and installing Docker in Linux:
+
+### What is Docker?
+
+- Platform for developing, shipping, and running applications
+- Uses containers for packaging applications and their dependencies
+- Enables consistent development and deployment across different environments
+- Provides isolation and portability for applications
+
+### Key Components
+
+1. Images
+   - Blueprints for containers
+   - Packaged software with all dependencies
+
+2. Containers
+   - Instances of images
+   - Lightweight, portable units of software
+
+3. Docker Engine
+   - Core component of Docker
+   - Manages building, running, and distributing Docker containers
+
+4. Docker Hub
+   - Public registry for sharing and discovering Docker images
+
+Analogy => Ubuntu is a container and its .iso is an image
+
+Steps:
+
+1) Create a Dockerfile
+   * This file defines the instructions for building the Docker image
+
+2) Create a .dockerignore file
+   * This file tells Docker which files and directories to ignore when building an image (similar to .gitignore).
+
+3) Build the Docker image
+   * Use the Docker CLI to build the image from the Dockerfile.
+   * docker build -t my-django-app-image .
+   
+4) Create a docker-compose.yml file
+   * This file helps you define and run multi-container Docker applications.
+
+5) Start the application with Docker Compose
+   * Run the containers defined in your docker-compose.yml file.
+   * docker-compose up
+
+6) Verify the application
+   * Access the application at http://localhost:8000 or whichever port you specified in the Dockerfile
+
+7) Stop and remove the containers
+   * docker-compose down
+
+8) Push the image to Docker Hub
+   * docker tag your-image-name yourusername/your-image-name
+   * docker push yourusername/your-image-name
+
+#TODO => Installing Docker on Linux => Refer Docker Documentation and follow the instructions
+
+#TODO => For indetail info on docker, refer my another repository based on Docker => https://github.com/Ayush29Ayush/Docker-Playground/tree/master
+
+#! Dockerizing Django Application
+
+1) Create Django Project and Application
+2) Create Dockerfile
+3) Create docker-compose.yml
+4) Change DATABASES in settings.py according to your database in docker-compose.yml
+5) Run docker-compose build
+6) Run docker-compose up 
+# docker-compose up --build (This usually corrupts the volume data) Avoid this
+7) To hit migrations inside container: docker-compose exec web python manage.py migrate
+8) ANOTHER WAY => To hit migrations inside container: docker exec -it aa5ec0ee1bd6 python manage.py migrate
+9) To open shell inside container: docker-compose exec web python manage.py shell
+10) To open bash inside container: docker-compose exec web bash or docker exec -it aa5ec0ee1bd6 bash
+11) Run docker-compose down
+12) To run container in detached mode: docker-compose up -d
+
+BEST APPROACH:
+   * docker-compose build
+   * docker-compose up
+   * docker ps
+   * docker exec -it aa5ec0ee1bd6 bash or docker-compose exec web bash (which is better as it does not need id)
+   * Then migrate, createsuperuser, shell or use any other command inside container as you do while local development
+      * python manage.py migrate
+      * python manage.py seeder
+      * python manage.py createsuperuser
+
+
+Terminal Output:
+```
+┬─[ayush@pop-os:~/D/D/0/docker_project]─[09:50:15 PM IST]─[G:master=]
+╰─>$ docker-compose down --volumes --remove-orphans
+Removing aa5ec0ee1bd6_docker_project_db_1 ... done
+Removing network docker_project_default
+Removing volume docker_project_docker_django_postgres_data
+┬─[ayush@pop-os:~/D/D/0/docker_project]─[09:50:24 PM IST]─[G:master=]
+╰─>$ docker-compose build
+db uses an image, skipping
+Building web
+[+] Building 13.9s (11/11) FINISHED                                                                                                                                      docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                                                                                                     0.0s
+ => => transferring dockerfile: 743B                                                                                                                                                     0.0s
+ => [internal] load metadata for docker.io/library/python:3.10.12                                                                                                                        3.1s
+ => [auth] library/python:pull token for registry-1.docker.io                                                                                                                            0.0s
+ => [internal] load .dockerignore                                                                                                                                                        0.0s
+ => => transferring context: 2B                                                                                                                                                          0.0s
+ => [1/5] FROM docker.io/library/python:3.10.12@sha256:bac3a0e0d16125977e351c861e2f4b12ecafeaa6f72431dc970d0b9155103232                                                                  0.0s
+ => => resolve docker.io/library/python:3.10.12@sha256:bac3a0e0d16125977e351c861e2f4b12ecafeaa6f72431dc970d0b9155103232                                                                  0.0s
+ => [internal] load build context                                                                                                                                                        0.5s
+ => => transferring context: 882.11kB                                                                                                                                                    0.3s
+ => CACHED [2/5] WORKDIR /code                                                                                                                                                           0.0s
+ => CACHED [3/5] COPY requirements.txt /code/                                                                                                                                            0.0s
+ => CACHED [4/5] RUN pip install -r requirements.txt                                                                                                                                     0.0s
+ => [5/5] COPY . /code/                                                                                                                                                                  2.8s
+ => exporting to image                                                                                                                                                                   7.1s
+ => => exporting layers                                                                                                                                                                  3.6s
+ => => exporting manifest sha256:b7808a23fe901c4be451a0f6ac965d96350100e780d229129037b73f6ce019b8                                                                                        0.0s
+ => => exporting config sha256:737500d54591fa659a1777e25ff1dc3ba821a9365601aac5f52b9f14bda27075                                                                                          0.0s
+ => => exporting attestation manifest sha256:4ef9b22e720a3e60c6103e272ccac3df7d070d886a14444c690d006b0b784377                                                                            0.0s
+ => => exporting manifest list sha256:c477f564a9d45780f7fd409597b2c9bb9be4a1f4f229cef3a56d67cce6f7cbab                                                                                   0.0s
+ => => naming to docker.io/library/docker_project_web:latest                                                                                                                             0.0s
+ => => unpacking to docker.io/library/docker_project_web:latest                                                                                                                          2.8s
+
+View build details: docker-desktop://dashboard/build/desktop-linux/desktop-linux/tip3mxcllep5f3lqxs1rmxmv0
+┬─[ayush@pop-os:~/D/D/0/docker_project]─[09:52:47 PM IST]─[G:master=]
+╰─>$ docker-compose up
+Creating network "docker_project_default" with the default driver
+Creating volume "docker_project_docker_django_postgres_data" with default driver
+Pulling db (postgres:13)...
+13: Pulling from library/postgres
+35199d0a6eca: Download complete
+1539d6d4b0a0: Download complete
+4db0bf51897c: Download complete
+ef3e9a00774a: Download complete
+23f17e809847: Download complete
+b35f5f06ba1f: Download complete
+090e86dd07d4: Download complete
+349ff876226d: Download complete
+b7830a5f7a9e: Download complete
+ed61c92d86a2: Download complete
+23644c5635ca: Download complete
+0920e99e58fd: Download complete
+c4489854ba43: Download complete
+Digest: sha256:1b154a7bbf474aa1a2e67dc7c976835645fe6c3425320e7ad3f5a926d509e8fc
+Status: Downloaded newer image for postgres:13
+Creating docker_project_db_1 ... done
+Creating docker_project_web_1 ... done
+Attaching to docker_project_db_1, docker_project_web_1
+```
+
+------------------------------------------------------------------------------------------------------------------------------------
