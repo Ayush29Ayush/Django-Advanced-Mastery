@@ -2613,3 +2613,233 @@ Simple flow:
 
 
 ------------------------------------------------------------------------------------------------------------------------------------
+
+#? Introduction to Websockets and Django Channels
+
+#! What is Websockets and Django Channels?
+
+Here are some brief but detailed notes on WebSockets, Django Channels, and Daphne:
+
+### WebSockets
+
+- Full-duplex communication protocol
+- Enables real-time bidirectional communication between client and server
+- Used for applications requiring instant updates
+
+Key characteristics:
+- Real-time data exchange without polling
+- Persistent connection throughout the session
+- Low latency
+- Bi-directional communication
+
+### Django Channels
+
+- Built-in framework for handling WebSockets in Django
+- Integrates with Django's asynchronous support
+- Allows building real-time features in Django apps
+
+Components:
+- Consumers: Handle WebSocket connections
+- Routing: Manages dispatching of connections to consumers
+- ASGI Application: Configures how different protocols are handled
+
+### Daphne
+
+- Official ASGI server maintained by Django project
+- Handles both HTTP and WebSocket connections
+- Used with Django Channels for real-time functionality
+
+#TODO => This is the proper way to setup Django Channels and Daphne.
+
+Official Documentation: https://channels.readthedocs.io/en/latest/#
+
+Step 1: Install Required Dependencies
+   * pip install channels
+   * pip install daphne
+   * pip install channels_redis
+
+Step 2: Update Django Settings
+   * Add "daphne" to INSTALLED_APPS in settings.py at the very beginning
+   * Add "channels" to INSTALLED_APPS in settings.py
+
+   * ASGI_APPLICATION = "your_project_name.asgi.application"
+
+   * Add CHANNEL_LAYERS in settings.py
+      "
+      CHANNEL_LAYERS = {
+         'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                  "hosts": [('127.0.0.1', 6379)],  # Replace with your Redis server
+            },
+         },
+      }
+      "
+
+Step 3: ASGI Configuration
+   * Create asgi.py in your project directory
+      "
+      import os
+      from django.core.asgi import get_asgi_application
+      from channels.routing import ProtocolTypeRouter, URLRouter
+      from channels.auth import AuthMiddlewareStack
+
+      os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project_name.settings")
+
+      application = ProtocolTypeRouter({
+         "http": get_asgi_application(),
+         "websocket": AuthMiddlewareStack(
+            URLRouter(
+                  # Add your WebSocket URL routing here
+            )
+         ),
+      })
+      "
+
+Step 4: Create a Consumer for WebSocket Handling
+   * Create consumer.py in your app directory
+      "
+      import json
+      from channels.generic.websocket import AsyncWebsocketConsumer
+
+      class ChatConsumer(AsyncWebsocketConsumer):
+         async def connect(self):
+            self.room_name = "chat_room"  # You can set this dynamically based on user or URL
+            self.room_group_name = f"chat_{self.room_name}"
+
+            # Join room group
+            await self.channel_layer.group_add(
+                  self.room_group_name,
+                  self.channel_name
+            )
+
+            await self.accept()
+
+         async def disconnect(self, close_code):
+            # Leave room group
+            await self.channel_layer.group_discard(
+                  self.room_group_name,
+                  self.channel_name
+            )
+
+         async def receive(self, text_data):
+            text_data_json = json.loads(text_data)
+            message = text_data_json["message"]
+
+            # Send message to room group
+            await self.channel_layer.group_send(
+                  self.room_group_name,
+                  {
+                     "type": "chat_message",
+                     "message": message
+                  }
+            )
+
+         async def chat_message(self, event):
+            message = event["message"]
+
+            # Send message to WebSocket
+            await self.send(text_data=json.dumps({
+                  "message": message
+            }))
+      "
+
+Step 5: Create a Routing Configuration
+   * Create routing.py in your project directory
+      "
+      from django.urls import re_path
+      from your_app_name.consumers import ChatConsumer
+
+      websocket_urlpatterns = [
+         re_path(r'ws/chat/$', ChatConsumer.as_asgi()),
+      ]
+      "
+
+Step 6: Update asgi.py to include websocket routing
+   * Update asgi.py to include websocket routing
+      "
+      from django.core.asgi import get_asgi_application
+      from channels.routing import ProtocolTypeRouter, URLRouter
+      from channels.auth import AuthMiddlewareStack
+      from your_project_name.routing import websocket_urlpatterns  # Import the WebSocket routing
+
+      os.environ.setdefault("DJANGO_SETTINGS_MODULE", "your_project_name.settings")
+
+      application = ProtocolTypeRouter({
+         "http": get_asgi_application(),
+         "websocket": AuthMiddlewareStack(
+            URLRouter(
+                  websocket_urlpatterns  # Add the URL routing for WebSockets here
+            )
+         ),
+      })
+      "
+
+Step 7: Add WebSocket Support to Your Frontend
+   * sample script tag for frontend 
+      "
+      <script>
+         const chatSocket = new WebSocket(
+            'ws://' + window.location.host + '/ws/chat/'
+         );
+
+         chatSocket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            document.querySelector('#chat-log').value += (data.message + '\n');
+         };
+
+         chatSocket.onclose = function(e) {
+            console.error('Chat socket closed unexpectedly');
+         };
+
+         document.querySelector('#chat-message-input').focus();
+         document.querySelector('#chat-message-input').onkeyup = function(e) {
+            if (e.keyCode === 13) {  // Enter key
+               const messageInputDom = document.querySelector('#chat-message-input');
+               const message = messageInputDom.value;
+               chatSocket.send(JSON.stringify({
+               'message': message
+               }));
+               messageInputDom.value = '';  // Clear the input
+            }
+         };
+         </script>
+      "
+
+Step 8: Run the Server
+   * You’ll need to use Daphne to run the server instead of the default WSGI server. You can do so by running:
+      * daphne your_project_name.asgi:application
+      * daphne your_project_name.asgi:application -b 0.0.0.0 -p 8000
+
+   * You can also use the Django development server to run the server, but it may be less efficient.
+      * python3 manage.py runserver
+
+Step 9: You can use POSTMAN to test the server:
+   * ws://localhost:8000/ws/main/
+
+#! Creating Consumers and setting websocket urls
+
+#TODO => Refer => https://channels.readthedocs.io/en/latest/installation.html
+
+* Refer "django_websocket_project"
+
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+#! NOTES
+
+1) For production (Best Practices):
+   * WSGI server: Gunicorn
+   * ASGI server: Daphne
+   * Django Channels (works with ASGI architecture): Daphne
+   * Serve static files: nginx or WhiteNoise
+   * Use Redis for caching: Redis
+   * Background Tasks: Celery
+   * Message Broker: Redis or RabbitMQ or Kafka
+   * Use Docker to build images: Dockerfile and docker-compose.yml
+   * Deployment: Nginx
+
+   * For traditional WSGI: We create views and urls
+   * For ASGI based WebSockets: We create consumers and routing
+
+------------------------------------------------------------------------------------------------------------------------------------
