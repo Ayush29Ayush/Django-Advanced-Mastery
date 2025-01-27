@@ -2823,6 +2823,40 @@ Step 9: You can use POSTMAN to test the server:
 
 * Refer "django_websocket_project"
 
+------------------------------------------------------------------------------------------------------------------------------------
+
+#? Django Project Deploymemt
+
+#! Understanding Difference between Shared & VPS hosting
+
+1) Shared Hosting
+   * Shared hosting is a type of hosting service that allows multiple users to share a single server.
+   * Mini partitions of the server are allocated to each user, and they share the same resources.
+   * Not a dedicated server, but a shared server. Can be used for low-performance projects.
+   * Not great for hosting as user cannot install software and packages on their own according to their requirements.
+   * It has PHP and Apache based system.
+
+2) VPS Hosting
+   * VPS stands for "Virtual Private Server."
+   * VPS hosting is a type of hosting service that allows a users to have their own dedicated server.
+   * Users can install their own software and packages on their own according to their requirements.
+   * Great for hosting high-performance projects.
+   * For Django, we need to install Python, Django, Nginx, WhiteNoise, Gunicorn or Daphne and other packages as per our requirements.
+
+#TODO => Deployment Reference => https://medium.com/@ganapriyakheersagar/hosting-django-application-with-nginx-and-gunicorn-in-production-99e64dc4345a
+
+#! Understanding Gunicorn & Nginx
+
+1) Gunicorn - It is a WSGI server used to run Django applications.
+            - It will act as a middleware between Nginx and Django.
+
+2) Nginx - It is a web server.
+         - It also acts as a reverse proxy and load balancer for the Gunicorn server.
+         - Serves Static and Media files.
+         - Handles HTTP requests and forwards them to the Gunicorn server.
+         - Handles SSL/TLS connections.
+         - Caching
+         - Load Balancing - It balances the load between multiple servers.
 
 ------------------------------------------------------------------------------------------------------------------------------------
 
@@ -2836,8 +2870,8 @@ Step 9: You can use POSTMAN to test the server:
    * Use Redis for caching: Redis
    * Background Tasks: Celery
    * Message Broker: Redis or RabbitMQ or Kafka
-   * Use Docker to build images: Dockerfile and docker-compose.yml
-   * Deployment: Nginx
+   * Use Docker to build images: Dockerfile and docker-compose.yml (Refer => https://github.com/Ayush29Ayush/Docker-Playground)
+   * Deployment: Nginx (Reverse Proxy) (Refer => https://github.com/Ayush29Ayush/Full-NGINX-Tutorial)
 
    * For traditional WSGI: We create views and urls
    * For ASGI based WebSockets: We create consumers and routing
