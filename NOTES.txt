@@ -2858,6 +2858,191 @@ Step 9: You can use POSTMAN to test the server:
          - Caching
          - Load Balancing - It balances the load between multiple servers.
 
+#! Deploying Entire Django Project on VPS using Github Nginx Gunicorn
+
+1) Get VPS (Virtual Private Server):
+   * AWS (Amazon Web Services) - EC2
+   * Digital Ocean - Droplet
+   * GCP (Google Cloud Platform) - Compute Engine
+   * Azure (Microsoft Azure) - Virtual Machine
+   * We can also host our own personal machine as VPS.
+
+2) Lets use Digital Ocean, so create a Droplet with the following configuration:
+   * Image: Ubuntu 20.04 LTS
+   * Size: 2GB
+   * Region: nyc1
+   * SSH Keys: None
+   * Password: Set your password
+
+3) Push your project to Github: Use the Expense Tracker project as an example
+   * git init
+   * git add .
+   * git commit -m "Initial commit"
+   * git remote add origin https://github.com/<username>/<project-name>.git
+   * git push -u origin master
+
+4) Refer => https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu
+
+5) Copy the IP address of your created server and open your terminal from your project directory
+   * Login to your server using SSH -> ssh root@<ip-address>
+   * sudo apt update
+   * sudo apt install python3-venv python3-dev libpq-dev postgresql postgresql-contrib nginx curl
+   * sudo -u postgres psql
+   * CREATE DATABASE myproject;
+   * CREATE USER myprojectuser WITH PASSWORD 'password';
+   * ALTER ROLE myprojectuser SET client_encoding TO 'utf8';
+   * ALTER ROLE myprojectuser SET default_transaction_isolation TO 'read committed';
+   * ALTER ROLE myprojectuser SET timezone TO 'UTC';
+   * GRANT ALL PRIVILEGES ON DATABASE myproject TO myprojectuser;
+   * \q
+   * exit
+   * mkdir ~/myprojectdir
+   * cd ~/myprojectdir
+   * python3 -m venv venv
+   * source venv/bin/activate
+   * git clone https://github.com/<username>/<project-name>.git
+   * cd <project-name>
+   * pip install --upgrade pip
+   * pip install -r requirements.txt (Install gunicorn if not present in requirements.txt)
+   * nano settings.py (make changes as per your requirements like database, serving static files using WhiteNoise, gunicorn, ALLOWED_HOSTS, etc.)
+   
+6) Check if project is able to run:
+   * python manage.py migrate
+   * python manage.py createsuperuser
+   * python manage.py collectstatic 
+   * sudo ufw allow 8000
+   * python manage.py runserver 0.0.0.0:8000
+   * Go to browser and type "localhost:8000/" and "http://server_domain_or_IP:8000/" and check if the project is running or not.
+   * Go to admin page and login using the created credentials for superuser.
+
+7) Testing Gunicorn’s Ability to Serve the Project
+   * cd <project-name>
+   * gunicorn --bind 0.0.0.0:8000 myproject.wsgi
+
+   * if whitenoise is not installed:
+      * Note: The admin interface will not have any of the styling applied since Gunicorn does not know how to find the static CSS content responsible for this.
+   * if whitenoise is installed:
+      * Note: The admin interface will have the styling applied since Gunicorn knows how to find the static CSS content responsible for this.
+
+8) Creating systemd Socket and Service Files for Gunicorn
+
+You have tested that Gunicorn can interact with our Django application, but you should now implement a more robust way of starting and stopping the application server. To accomplish this, you’ll make systemd service and socket files.
+
+The Gunicorn socket will be created at boot and will listen for connections. When a connection occurs, systemd will automatically start the Gunicorn process to handle the connection.
+
+Start by creating and opening a systemd socket file for Gunicorn with sudo privileges:
+   * sudo nano /etc/systemd/system/gunicorn.socket
+   * Add the following content:
+   ```
+   [Unit]
+   Description=gunicorn socket
+
+   [Socket]
+   ListenStream=/run/gunicorn.sock
+
+   [Install]
+   WantedBy=sockets.target
+   ```
+   * Save and close the file.
+
+9) Create a systemd service file for Gunicorn with sudo privileges:
+   * sudo nano /etc/systemd/system/gunicorn.service
+   * Add the following content (make changes as per your requirements and path):
+   ```
+   [Unit]
+   Description=gunicorn daemon
+   Requires=gunicorn.socket
+   After=network.target
+
+   [Service]
+   User=sammy
+   Group=www-data
+   WorkingDirectory=/home/sammy/myprojectdir
+   ExecStart=/home/sammy/myprojectdir/myprojectenv/bin/gunicorn \
+            --access-logfile - \
+            --workers 3 \
+            --bind unix:/run/gunicorn.sock \
+            myproject.wsgi:application
+
+   [Install]
+   WantedBy=multi-user.target
+   ```
+
+10) Run the following commands:
+   * sudo systemctl start gunicorn.socket
+   * sudo systemctl enable gunicorn.service
+   * sudo systemctl status gunicorn.socket
+   * sudo systemctl status gunicorn.service
+   * sudo systemctl status gunicorn
+
+11) Check for existence of gunicrn.sock file in /run directory:
+   * file /run/gunicorn.sock
+   * If file does not exist, check the gunicorn socket's log by typing:
+      * sudo journalctl -u gunicorn.socket
+
+12) If everything goes well and there are no errors:
+   * sudo systemctl daemon-reload
+   * sudo systemctl restart gunicorn
+   * sudo systemctl status gunicorn
+
+13) NGINX Setup:
+   * Refer => https://github.com/Ayush29Ayush/Full-NGINX-Tutorial
+   * Refer => https://www.digitalocean.com/community/tutorials/how-to-set-up-django-with-postgres-nginx-and-gunicorn-on-ubuntu
+   * Now go to browser and type "http://server_domain_or_IP:8000/" and check if the project is running or not.
+
+14) Domain Setup:
+   * We will buy a domain name and point it to our server.
+   * There are various ways to do this, one of them is to use the Hostinger domain service.
+   * Now after buying a domain, we have to change the NAME SERVER of the domain to the IP address of our server. Get them from the DNS records section of digitalocean and then go to "DNS/Nameservers" section of Hostinger and select "Change nameserver" and paste the IP address of our server.
+   * In the "Networking" section of digitalocean, add your domain name.
+   * In digitalocean's DNS records, map your domain name to the IP address of your server and press "Create new record".
+
+   * Now again login to your server and update the NGINX configuration file with the new domain name.
+      * sudo nano /etc/nginx/sites-available/myproject
+      * server_name 146.190.103.144 myproject.com www.myproject.com;
+      * sudo ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled
+      * sudo nginx -t
+      * sudo systemctl restart nginx
+      * sudo ufw allow 'Nginx Full'
+      * sudo ufw status
+
+   * Go to "https://dnschecker.org/" and type your domain name and check if it is working or not.
+
+   * Go to browser and type your domain name and check if it is working or not.
+
+15) For SSL Setup:
+   * Refer => https://github.com/Ayush29Ayush/Full-NGINX-Tutorial
+   * Refer => https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-22-04
+
+   * Go to browser and type your domain name and check if the warning is showing or not.
+
+------------------------------------------------------------------------------------------------------------------------------------
+
+DOUBTS
+
+Ques) For my django project in production, in the server gunicorn is used as my WSGI server and NGINX and web server and to serve static files. So do I need whitenoise? Also if I use whitenoise to serve static files then do i need to serve them in nginx also?
+
+Ans)
+
+In your production setup, you're using Gunicorn as your WSGI server and NGINX to serve static files. If you're already serving static files through NGINX, you generally don't need Whitenoise. Here's a breakdown of the components and how they interact:
+
+NGINX Serving Static Files
+   NGINX is an efficient static file server, and it can handle the delivery of static files like images, JavaScript, and CSS directly to users, without involving your Django application. This is a very common setup in production because NGINX can serve these files quickly and with minimal overhead.
+
+Whitenoise
+   Whitenoise is a library that allows your Django application to serve static files directly, even in production, without needing a separate web server like NGINX for that purpose. It's useful for smaller setups or simpler applications where you don't want to configure an additional web server for static files. It can serve files in a way that ensures they're properly cached and compressed.
+
+Do You Need Whitenoise?
+   If you're using NGINX to serve static files, you don’t need Whitenoise. NGINX is more than capable of handling the static file delivery.
+   If you want Whitenoise, it's typically used for serving static files when you want to keep everything within the Django stack (for example, if you don't want to manage an additional server or if you're using platforms like Heroku). But with NGINX already set up for this purpose, it’s redundant.
+If You Use Whitenoise, Do You Need NGINX?
+   If you switch to using Whitenoise to serve static files, you don't need NGINX to serve static files anymore. Whitenoise would handle it within the Django application itself. However, NGINX would still be useful for handling other things like reverse proxying requests to Gunicorn and serving media files (like user uploads), but static file serving can be handled by Whitenoise in this case.
+
+Summary:
+   If NGINX is already serving your static files efficiently, you don’t need Whitenoise.
+   If you decide to use Whitenoise, NGINX can still serve other things (like media files or reverse proxying requests) but would no longer be needed for static files.
+
+
 ------------------------------------------------------------------------------------------------------------------------------------
 
 #! NOTES
